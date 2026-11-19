@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project CIWS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai+Looped:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef5f9;
+  --surface:#ffffff;
+  --ink:#17324a;
+  --muted:#5b7488;
+  --line:#d5e3ec;
+  --water:#1ea7e1;
+  --water-soft:#dff2fb;
+  --leaf:#2fae7e;
+  --coral:#f2694b;
+  --sun:#ffc94a;
+  --lock:#e08a00;
+  --display:"Mitr","IBM Plex Sans Thai Looped",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai Looped","Mitr",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.2,.75,.2,1);
+  color-scheme:light;
+  /* layout: one slide at a time on a fixed stage; slides move toward/away from the viewer (depth) on change */
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;overflow:hidden}
+body::before{content:"";position:fixed;inset:-20%;background:
+  radial-gradient(40% 35% at 15% 20%,rgba(30,167,225,.13),transparent 70%),
+  radial-gradient(35% 30% at 85% 80%,rgba(47,174,126,.10),transparent 70%),
+  radial-gradient(30% 25% at 80% 10%,rgba(255,201,74,.14),transparent 70%);animation:drift 24s ease-in-out infinite alternate;pointer-events:none}
+@keyframes drift{to{transform:translate(4%,-3%) rotate(3deg)}}
+
+#deck{position:fixed;inset:0;perspective:1200px}
+.slide{position:absolute;inset:0;overflow-y:auto;padding:clamp(28px,5vw,72px) clamp(18px,7vw,110px) 96px;display:flex;flex-direction:column;justify-content:center;gap:26px;
+  opacity:0;visibility:hidden;transform:scale(1.14);filter:blur(6px);
+  transition:opacity .6s var(--ease),transform .9s var(--ease),filter .6s var(--ease),visibility 0s linear .9s}
+.slide.past{transform:scale(.86)}
+.slide.on{opacity:1;visibility:visible;transform:none;filter:none;transition:opacity .7s var(--ease) .15s,transform .9s var(--ease) .1s,filter .7s var(--ease) .15s,visibility 0s}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease),transform .7s var(--ease)}
+.slide.on .rv{opacity:1;transform:none;transition-delay:calc(.35s + var(--i,0) * .09s)}
+
+.tag{font-family:var(--display);font-size:15px;font-weight:500;color:var(--water);display:inline-flex;align-items:center;gap:10px;background:var(--water-soft);padding:4px 14px 4px 6px;border-radius:999px;width:max-content}
+.tag b{background:var(--water);color:#fff;border-radius:999px;font-weight:500;font-size:13px;padding:1px 10px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.2;font-weight:500}
+h2{font-size:clamp(30px,4vw,50px)}
+h3{font-size:20px}
+p{margin:0;max-width:65ch}
+.lead{font-size:clamp(18px,1.6vw,21px);color:var(--muted)}
+.lead strong{color:var(--ink);font-weight:600}
+
+/* title */
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,56px);align-items:center}
+.hero h1{font-size:clamp(76px,11vw,156px);font-weight:600;letter-spacing:.02em;line-height:1}
+.hero h1 span{color:var(--water)}
+.expand{font-family:var(--display);font-size:clamp(17px,1.6vw,22px);color:var(--muted);margin-top:10px}
+.expand s{text-decoration-color:var(--coral);text-decoration-thickness:3px;color:#9fb1bf}
+.expand em{font-style:normal;color:var(--water);font-weight:500}
+.hero .lead{margin-top:20px}
+.hint{font-size:14px;color:var(--muted);margin-top:26px}
+kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 7px;background:var(--surface);color:var(--ink)}
+#heroCv{width:100%;aspect-ratio:5/4;max-height:62vh;background:linear-gradient(#cfe9f6,#f3f9fc 70%);border-radius:28px;box-shadow:0 30px 60px -30px rgba(23,50,74,.35)}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.card{background:var(--surface);border-radius:20px;padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 0 var(--line),0 18px 40px -28px rgba(23,50,74,.4);transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.card:hover{transform:translateY(-4px);box-shadow:0 1px 0 var(--line),0 26px 50px -26px rgba(23,50,74,.45)}
+.card p{color:var(--muted);font-size:16px}
+.ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--water-soft);color:var(--water)}
+.ico svg{width:24px;height:24px}
+.card.c .ico{background:#fde6e0;color:var(--coral)}
+.card.g .ico{background:#dcf3ea;color:var(--leaf)}
+.card.y .ico{background:#fff2cf;color:var(--lock)}
+.callout{background:var(--ink);color:#fff;border-radius:18px;padding:18px 24px;font-size:19px;max-width:none;display:flex;gap:14px;align-items:center}
+.callout strong{color:var(--sun);font-weight:600}
+.callout .dot{width:12px;height:12px;border-radius:50%;background:var(--water);flex:none;animation:ping 1.8s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(30,167,225,.7)}100%{box-shadow:0 0 0 14px rgba(30,167,225,0)}}
+
+/* compare */
+.compare{display:flex;flex-direction:column;gap:10px}
+.row{display:grid;grid-template-columns:1fr 44px 1fr;align-items:center;gap:10px}
+.row>div{background:var(--surface);border-radius:14px;padding:12px 18px;font-size:16px;box-shadow:0 1px 0 var(--line)}
+.row>div:first-child{color:var(--muted)}
+.row .arr{background:none;box-shadow:none;padding:0;text-align:center;color:var(--water);font-size:22px}
+.row.head>div{background:none;box-shadow:none;font-family:var(--display);font-weight:500;font-size:15px;color:var(--muted);padding:0 18px}
+.row.star>div:last-child{background:var(--water);color:#fff}
+.row.iff>div:last-child{background:#fde6e0;color:#a33a22}
+
+/* sim */
+.sim-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;min-height:0}
+#stage{position:relative;height:min(60vh,600px);min-height:360px;border-radius:22px;background:#d7eaf4;overflow:hidden;box-shadow:0 24px 50px -30px rgba(23,50,74,.45)}
+#stage canvas{display:block;width:100%;height:100%}
+#stage canvas.gl{touch-action:pan-y;cursor:grab}
+#stage canvas.gl:active{cursor:grabbing}
+#overlay{position:absolute;inset:0;pointer-events:none}
+.hud{position:absolute;left:14px;top:14px;display:flex;flex-direction:column;gap:6px;pointer-events:none;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(255,255,255,.92);border-radius:999px;font-family:var(--display);font-size:16px;font-weight:500;width:max-content;box-shadow:0 6px 16px -8px rgba(23,50,74,.4);transition:background .3s,color .3s}
+.chip i{width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.chip[data-s="TRACK"] i,.chip[data-s="AWAIT"] i,.chip[data-s="DETECT"] i,.chip[data-s="IFF"] i{background:var(--lock)}
+.chip[data-s="ENGAGE"]{background:var(--water);color:#fff}
+.chip[data-s="ENGAGE"] i{background:#fff}
+.chip[data-s="HOLD"]{background:var(--coral);color:#fff}
+.chip[data-s="HOLD"] i{background:#fff}
+.chip[data-s="ASSESS"] i{background:var(--leaf)}
+.hud .line{background:rgba(255,255,255,.8);border-radius:8px;padding:2px 10px;width:max-content;color:var(--muted)}
+.hud .line b{color:var(--ink);font-weight:600}
+.clock{position:absolute;right:14px;top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);background:rgba(255,255,255,.8);border-radius:8px;padding:3px 9px;pointer-events:none}
+.draghint{position:absolute;right:14px;bottom:12px;font-size:12px;color:var(--muted);pointer-events:none}
+.fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;color:var(--muted)}
+
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.box{background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:0 1px 0 var(--line)}
+.box h4{margin:0 0 10px;font-family:var(--display);font-size:14px;font-weight:500;color:var(--muted)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font-family:var(--body);font-size:14px;font-weight:500;color:var(--ink);background:var(--bg);border:1px solid var(--line);padding:9px 10px;cursor:pointer;border-radius:12px;transition:background .2s,transform .15s,border-color .2s}
+button:hover{border-color:var(--water);background:var(--water-soft)}
+button:active{transform:scale(.97)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed;background:var(--bg);border-color:var(--line)}
+button.wide{grid-column:1/-1}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;background:transparent}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 2px 8px -3px rgba(23,50,74,.35);color:var(--water)}
+#fire{background:var(--coral);border-color:var(--coral);color:#fff;font-family:var(--display);font-size:15px;margin-top:8px;width:100%}
+#fire:disabled{background:var(--bg);color:var(--muted);border-color:var(--line)}
+#fire:not(:disabled){animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(242,105,75,.25)}}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);margin-top:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat .v{font-family:var(--display);font-size:24px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.2}
+.stat .l{font-size:12px;color:var(--muted);line-height:1.3}
+#log{list-style:none;margin:0;padding:0;font-size:12.5px;line-height:1.45;display:flex;flex-direction:column;gap:4px;max-height:150px;overflow:hidden}
+#log li{color:var(--muted);display:grid;grid-template-columns:46px 1fr;gap:6px;animation:logIn .4s var(--ease)}
+@keyframes logIn{from{opacity:0;transform:translateX(-8px)}}
+#log li span:first-child{font-family:var(--mono);font-size:11px;color:#9ab0bf;padding-top:1px}
+#log li.a span:last-child{color:var(--lock)}
+#log li.w span:last-child{color:var(--water)}
+#log li.h span:last-child{color:var(--coral)}
+#log li.o span:last-child{color:var(--leaf)}
+
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;position:relative}
+.step{padding:18px 14px;background:var(--surface);border-radius:18px;display:flex;flex-direction:column;gap:8px;position:relative;box-shadow:0 1px 0 var(--line);animation:glow 5.6s var(--ease) infinite;animation-delay:calc(var(--s) * .8s)}
+@keyframes glow{0%,14%{box-shadow:0 0 0 2px var(--water),0 18px 30px -18px rgba(30,167,225,.6);transform:translateY(-6px)}22%,100%{box-shadow:0 1px 0 var(--line);transform:none}}
+.step .n{font-family:var(--display);font-size:13px;color:#fff;background:var(--water);width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+.step.iff .n{background:var(--coral)}
+.step h3{font-size:18px}
+.step p{font-size:14px;color:var(--muted)}
+.loop{font-size:15px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.loop svg{width:22px;height:22px;color:var(--water);animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.hw{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.hw .box{padding:18px 20px;border-radius:20px}
+.hw ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+.hw li{font-size:15px;color:var(--muted)}
+.hw li b{color:var(--ink);font-weight:600;display:block}
+
+.end{align-items:center;text-align:center}
+.end h2{font-size:clamp(36px,5.6vw,76px)}
+.end p{margin-inline:auto}
+.end .qa{font-family:var(--display);font-size:clamp(20px,2.2vw,28px);color:var(--water);margin-top:6px}
+.drops{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.drops i{position:absolute;bottom:-40px;width:14px;height:18px;background:var(--water);opacity:.25;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-115vh) translateX(var(--dx,0));opacity:0}}
+
+/* design diagrams */
+.split{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(20px,3vw,44px);align-items:center;min-height:0}
+.fig{background:var(--surface);border-radius:22px;padding:14px;box-shadow:0 1px 0 var(--line),0 24px 50px -32px rgba(23,50,74,.45)}
+.dg{width:100%;height:auto;max-height:62vh;display:block}
+.dg text{font-family:var(--body);font-size:14px;fill:var(--ink)}
+.dg .ts{font-size:12px;fill:var(--muted)}
+.dg .tw{fill:#fff;font-family:var(--display);font-size:13px;text-anchor:middle;dominant-baseline:central}
+.dg .hd{font-family:var(--display);font-size:15px;font-weight:500}
+.dg .mid{text-anchor:middle}
+.dg .bx{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.dg .bxw{fill:var(--water-soft);stroke:var(--water);stroke-width:1.5}
+.dg .bxc{fill:#fde6e0;stroke:var(--coral);stroke-width:1.5}
+.dg .bxy{fill:#fff2cf;stroke:var(--lock);stroke-width:1.5}
+.dg .bxg{fill:#dcf3ea;stroke:var(--leaf);stroke-width:1.5}
+.dg .w{fill:none;stroke:#a9bccb;stroke-width:2}
+.dg .dim{stroke:var(--muted);stroke-width:1.2;fill:none}
+.dg .fl{fill:none;stroke:var(--water);stroke-width:2.5;stroke-dasharray:6 9;animation:dash 1.1s linear infinite}
+.dg .fl.p12{stroke:var(--coral)}
+.dg .fl.p5{stroke:var(--lock)}
+.dg .fl.g{stroke:var(--leaf)}
+.dg .co circle{fill:var(--water)}
+@keyframes dash{to{stroke-dashoffset:-30}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s var(--ease)}
+.slide.on .draw{stroke-dashoffset:0;transition-delay:.5s}
+.sm .nd rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5;animation:smglow 7.2s var(--ease) infinite;animation-delay:calc(var(--s) * 1.2s)}
+@keyframes smglow{0%,13%{fill:var(--water-soft);stroke:var(--water);stroke-width:3}18%,100%{fill:var(--surface);stroke:var(--line);stroke-width:1.5}}
+.sm .hold rect{fill:#fde6e0;stroke:var(--coral);stroke-width:1.5}
+.sm .await rect{fill:#fff2cf;stroke:var(--lock);stroke-width:1.5;stroke-dasharray:5 4}
+.notes{display:flex;flex-direction:column;gap:14px}
+.note{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start}
+.note .k{width:28px;height:28px;border-radius:50%;background:var(--water);color:#fff;font-family:var(--display);font-size:13px;display:grid;place-items:center}
+.note .k.c{background:var(--coral)}.note .k.y{background:var(--lock)}.note .k.g{background:var(--leaf)}
+.note h3{font-size:17px}
+.note p{font-size:15px;color:var(--muted)}
+.formula{font-family:var(--mono);font-size:15px;background:var(--bg);border-radius:10px;padding:6px 12px;color:var(--ink);width:max-content;max-width:100%;margin-top:4px}
+.example{background:var(--ink);color:#fff;border-radius:16px;padding:14px 18px;font-size:15px}
+.example b{color:var(--sun);font-weight:600}
+.bars{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.bar{display:grid;grid-template-columns:56px 1fr 44px;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.bar i{display:block;height:12px;border-radius:6px;background:var(--water);width:0;transition:width 1.2s var(--ease)}
+.slide.on .bar i{width:var(--w);transition-delay:calc(.8s + var(--d) * .25s)}
+.bar span:last-child{font-family:var(--mono);color:var(--ink)}
+
+/* phone mockup */
+.phone{width:280px;height:min(580px,68vh);background:var(--ink);border-radius:42px;padding:11px;justify-self:center;box-shadow:0 40px 70px -35px rgba(23,50,74,.6);position:relative}
+.screen{background:#f6fafc;border-radius:32px;height:100%;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:14px 14px 16px;position:relative;font-size:13px}
+.sbar{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 8px}
+.ahead{display:flex;justify-content:space-between;align-items:center}
+.ahead b{font-family:var(--display);font-weight:500;font-size:15px}
+.ahead .on{font-size:11px;background:#dcf3ea;color:var(--leaf);border-radius:999px;padding:2px 9px}
+.live{border-radius:16px;overflow:hidden;position:relative;background:linear-gradient(#cfe9f6,#eef6fa);aspect-ratio:16/10}
+.live svg{width:100%;height:100%;display:block}
+.live .lbl{position:absolute;left:8px;top:6px;font-size:10px;background:var(--coral);color:#fff;border-radius:999px;padding:1px 8px}
+.abtn{display:grid;grid-template-columns:1.4fr 1fr;gap:8px}
+.abtn span{border-radius:12px;padding:8px;text-align:center;font-family:var(--display);font-size:13px}
+.abtn span:first-child{background:var(--coral);color:#fff;animation:pulse 1.4s ease-in-out infinite}
+.abtn span:last-child{background:#e6eef3;color:var(--muted)}
+.mini{background:#fff;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 0 var(--line)}
+.mini .r{display:flex;justify-content:space-between;color:var(--muted)}
+.mini .r b{color:var(--ink);font-family:var(--display);font-weight:500;font-size:15px}
+.hist{display:flex;align-items:flex-end;gap:4px;height:46px}
+.hist i{flex:1;background:var(--water-soft);border-radius:3px 3px 0 0}
+.hist i.pk{background:var(--water)}
+.hlab{display:flex;justify-content:space-between;font-family:var(--mono);font-size:9px;color:#9ab0bf}
+.tankbar{height:8px;border-radius:4px;background:#e6eef3;overflow:hidden}
+.tankbar i{display:block;height:100%;width:62%;background:var(--water)}
+.toast{position:absolute;left:12px;right:12px;top:12px;background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 14px 30px -12px rgba(23,50,74,.45);display:flex;gap:10px;align-items:center;font-size:12px;animation:toast 6s var(--ease) infinite}
+.toast .ti{width:30px;height:30px;border-radius:9px;background:var(--water);flex:none}
+.toast b{display:block;font-family:var(--display);font-weight:500;font-size:13px}
+@keyframes toast{0%,8%{transform:translateY(-130%);opacity:0}16%,55%{transform:none;opacity:1}65%,100%{transform:translateY(-130%);opacity:0}}
+.mocknote{font-size:13px;color:var(--muted);text-align:center;margin-top:10px}
+@media (max-width:900px){.split{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.dg .fl,.sm .nd rect,.toast,.abtn span:first-child{animation:none}.draw{stroke-dashoffset:0}}
+
+/* chrome */
+.progress{position:fixed;top:0;left:0;height:4px;background:var(--water);border-radius:0 4px 4px 0;transition:width .7s var(--ease);z-index:5}
+.ctrl{position:fixed;right:18px;bottom:16px;display:flex;gap:8px;align-items:center;z-index:5}
+.ctrl button{width:42px;height:42px;padding:0;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 8px 20px -10px rgba(23,50,74,.5)}
+.ctrl button svg{width:18px;height:18px}
+.ctrl .fsb{width:auto;border-radius:999px;padding:0 14px;font-size:13px}
+.count{font-family:var(--mono);font-size:13px;color:var(--muted);min-width:52px;text-align:center}
+.dots{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:8px;z-index:5}
+.dots button{width:9px;height:9px;padding:0;border-radius:999px;background:#bfd2de;border:0;transition:width .4s var(--ease),background .3s}
+.dots button[aria-current="true"]{width:28px;background:var(--water)}
+
+@media (max-width:1100px){.flow{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr}
+  #heroCv{max-height:38vh}
+  .sim-grid{grid-template-columns:1fr}
+  .dots{display:none}
+  .slide{justify-content:flex-start}
+  .row{grid-template-columns:1fr 28px 1fr}
+}
+@media (max-width:520px){.flow{grid-template-columns:1fr 1fr}.btns{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  .slide,.slide.on,.rv,.slide.on .rv{transition:opacity .2s linear;transform:none;filter:none}
+  .step,.loop svg,.drops i,.callout .dot,#fire:not(:disabled),body::before{animation:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#7f97a8"/></marker>
+<marker id="arC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f2694b"/></marker>
+<marker id="arG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2fae7e"/></marker>
+</defs></svg>
+<div class="progress" id="prog"></div>
+<main id="deck">
+
+<!-- 1 -->
+<section class="slide on" aria-label="หน้าปก">
+  <div class="hero">
+    <div>
+      <div class="tag rv"><b>โปรเจกต์</b>ระบบอัตโนมัติ</div>
+      <h1 class="rv" style="margin-top:18px">CIW<span>S</span></h1>
+      <div class="expand rv">Close-In <s>Weapon</s> <em>Water</em> System</div>
+      <p class="lead rv"><strong>ระบบป้องกันระยะประชิดด้วยน้ำ</strong> ไล่นกพิราบออกจากระเบียงแบบไม่ทำร้าย ด้วยหลักการเดียวกับป้อมปืน Phalanx บนเรือรบ</p>
+      <p class="hint rv">กด <kbd>→</kbd> หรือ <kbd>Space</kbd> เพื่อไปต่อ · <kbd>F</kbd> เต็มจอ</p>
+    </div>
+    <canvas id="heroCv" class="rv" aria-label="ภาพเคลื่อนไหว ป้อมฉีดน้ำไล่นกพิราบ"></canvas>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide" aria-label="ปัญหา">
+  <div class="tag rv"><b>01</b>ปัญหา</div>
+  <h2 class="rv">นกพิราบยึดระเบียง และวิธีเดิมใช้ได้ไม่นาน</h2>
+  <div class="cards">
+    <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></svg></div><h3>ขี้นกสะสม</h3><p>เป็นแหล่งเชื้อโรคทางเดินหายใจ ทำสีและพื้นผิวอาคารเสียหาย ล้างออกยากและต้องล้างซ้ำทุกสัปดาห์</p></div>
+    <div class="card c rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 15c1-1.3 2.4-2 4-2s3 .7 4 2M9 9.5h.01M15 9.5h.01"/></svg></div><h3>นกชินกับของที่อยู่นิ่ง</h3><p>หุ่นไล่กา เหยี่ยวปลอม หรือหนามกันนก ได้ผลแค่ไม่กี่วัน เพราะมันไม่ขยับและไม่ตอบโต้ นกจึงเรียนรู้ว่าไม่มีอันตราย</p></div>
+    <div class="card g rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="14" r="6"/><path d="M12 8c0-3 2-5 5-5-0 3-2 5-5 5z"/></svg></div><h3>สวนผลไม้ก็เจอ</h3><p>นกและกระรอกกินผลผลิตก่อนเก็บเกี่ยว ชาวสวนต้องเฝ้าเองหรือยอมเสียผลผลิต</p></div>
+  </div>
+  <p class="callout rv"><span class="dot"></span><span>สิ่งที่ยังไม่มีคือระบบที่ <strong>มองเห็นเอง ตัดสินใจเอง และตอบโต้เอง</strong> ทุกครั้งที่นกมา</span></p>
+</section>
+
+<!-- 3 -->
+<section class="slide" aria-label="แรงบันดาลใจ">
+  <div class="tag rv"><b>02</b>แรงบันดาลใจ</div>
+  <h2 class="rv">Phalanx CIWS ด่านป้องกันสุดท้ายของเรือรบ</h2>
+  <p class="lead rv">ป้อมอัตโนมัติบนเรือรบ ใช้สกัดขีปนาวุธและอากาศยานที่หลุดเข้ามาถึงระยะประชิด ทำงานจบในตัวเองตั้งแต่หาเป้าจนถึงยิง</p>
+  <div class="cards">
+    <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 12l6-6"/></svg></div><h3>หาและติดตามเป้าเอง</h3><p>เรดาร์ค้นหากวาดหาเป้า แล้วส่งต่อให้เรดาร์ติดตามล็อกเป้าไว้</p></div>
+    <div class="card y rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg></div><h3>ตัดสินใจเองได้</h3><p>เป้ามาเร็วเกินกว่าคนจะตัดสินใจทัน ระบบจึงประเมินและตอบโต้เองได้ในโหมดอัตโนมัติ</p></div>
+    <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg></div><h3>ปรับเล็งแบบวงปิด</h3><p>มองเห็นทั้งเป้าและสิ่งที่ยิงออกไป แล้วแก้มุมให้ตรงระหว่างยิง</p></div>
+  </div>
+  <p class="callout rv"><span class="dot"></span><span>เราย่อส่วนแนวคิดนี้ลงมาไว้บนระเบียงคอนโด และเปลี่ยนกระสุนเป็น <strong>น้ำ</strong></span></p>
+</section>
+
+<!-- 4 -->
+<section class="slide" aria-label="เทียบระบบ">
+  <div class="tag rv"><b>03</b>แนวคิด</div>
+  <h2 class="rv">เทียบทีละส่วน</h2>
+  <div class="compare">
+    <div class="row head rv"><div>Phalanx (ของจริง)</div><div class="arr"></div><div>CIWS ของเรา</div></div>
+    <div class="row rv"><div>เรดาร์ค้นหา: กวาดหาเป้า</div><div class="arr">→</div><div>กล้องมุมกว้างเฝ้าทั้งระเบียง</div></div>
+    <div class="row rv"><div>เรดาร์ติดตาม: ล็อกเป้า</div><div class="arr">→</div><div>กล้องบนฐานหมุน pan-tilt หันตามนก</div></div>
+    <div class="row rv"><div>ปืนกล 20 มม.</div><div class="arr">→</div><div>ปั๊มน้ำ 12V + โซลินอยด์วาล์ว + หัวฉีด</div></div>
+    <div class="row rv"><div>คอมพิวเตอร์ควบคุมการยิง</div><div class="arr">→</div><div>Raspberry Pi 5 + ชิปเร่ง AI</div></div>
+    <div class="row star rv"><div>ปรับเล็งแบบวงปิด</div><div class="arr">→</div><div>กล้องเห็นสายน้ำที่ฉีดออกไป พลาดก็แก้มุมทันที</div></div>
+    <div class="row rv"><div>แม็กกาซีนกระสุน</div><div class="arr">→</div><div>ถังน้ำ 5–10 ลิตร + เซนเซอร์ระดับน้ำ</div></div>
+    <div class="row iff rv"><div>ระบบระบุฝ่าย (IFF)</div><div class="arr">→</div><div>AI แยกนกออกจากคน แมว หมา เจอเมื่อไหร่งดยิง</div></div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide" aria-label="ขั้นตอนการทำงาน">
+  <div class="tag rv"><b>04</b>การทำงาน</div>
+  <h2 class="rv">7 ขั้นตอน ตั้งแต่เห็นนกจนบันทึกผล</h2>
+  <div class="flow">
+    <div class="step rv" style="--s:0"><span class="n">1</span><h3>เฝ้าระวัง</h3><p>กล้องมุมกว้างเฝ้าพื้นที่ ใช้ไฟต่ำ</p></div>
+    <div class="step rv" style="--s:1"><span class="n">2</span><h3>ตรวจจับ</h3><p>AI เจอวัตถุที่น่าจะเป็นนก</p></div>
+    <div class="step iff rv" style="--s:2"><span class="n">3</span><h3>ระบุฝ่าย</h3><p>ยืนยันว่าเป็นนก ถ้ามีคนหรือสัตว์เลี้ยงในภาพ งดยิง</p></div>
+    <div class="step rv" style="--s:3"><span class="n">4</span><h3>ล็อกเป้า</h3><p>ฐานหมุนหันตาม คำนวณจุดดักหน้าและวิถีโค้งของน้ำ</p></div>
+    <div class="step rv" style="--s:4"><span class="n">5</span><h3>ฉีดน้ำ</h3><p>ฉีดสั้นๆ พร้อมปรับเล็งแบบวงปิด</p></div>
+    <div class="step rv" style="--s:5"><span class="n">6</span><h3>ประเมินผล</h3><p>นกยังอยู่ก็ฉีดซ้ำ บินไปแล้วก็กลับไปเฝ้า</p></div>
+    <div class="step rv" style="--s:6"><span class="n">7</span><h3>บันทึก</h3><p>ส่งสถิติขึ้นแอป: กี่ครั้ง ช่วงไหน ใช้น้ำเท่าไหร่</p></div>
+  </div>
+  <p class="loop rv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v5h-5"/></svg>วนกลับขั้นที่ 1 ทุกครั้งที่จบ ทำงานได้ 24 ชั่วโมงโดยไม่ต้องมีคนเฝ้า</p>
+</section>
+
+<!-- ARCH -->
+<section class="slide" aria-label="สถาปัตยกรรมระบบ">
+  <div class="tag rv"><b>05</b>ออกแบบระบบ</div>
+  <h2 class="rv">ภาพรวมระบบ: รับข้อมูล → คิด → สั่งงาน</h2>
+  <div class="split">
+    <div class="fig rv">
+      <svg class="dg" viewBox="0 0 780 440" role="img" aria-label="แผนภาพสถาปัตยกรรมระบบ">
+        <text x="105" y="26" class="hd mid">รับข้อมูล</text>
+        <text x="390" y="26" class="hd mid">ประมวลผล</text>
+        <text x="675" y="26" class="hd mid">สั่งงาน</text>
+        <g>
+          <rect x="20" y="50" width="170" height="56" rx="14" class="bx"/><text x="36" y="74">กล้องมุมกว้าง</text><text x="36" y="94" class="ts">เฝ้าทั้งพื้นที่</text>
+          <rect x="20" y="130" width="170" height="56" rx="14" class="bx"/><text x="36" y="154">กล้องติดตาม</text><text x="36" y="174" class="ts">ภาพเป้าและสายน้ำ</text>
+          <rect x="20" y="210" width="170" height="56" rx="14" class="bx"/><text x="36" y="234">เซนเซอร์ระดับน้ำ</text><text x="36" y="254" class="ts">น้ำที่เหลือในถัง</text>
+        </g>
+        <rect x="270" y="40" width="240" height="246" rx="18" class="bxw"/>
+        <text x="390" y="66" class="hd mid">Raspberry Pi 5 + ชิป AI</text>
+        <rect x="290" y="80" width="200" height="38" rx="10" class="bx"/><text x="390" y="104" class="mid">ตรวจจับวัตถุ (YOLO)</text>
+        <rect x="290" y="130" width="200" height="38" rx="10" class="bxc"/><text x="390" y="154" class="mid">ระบุฝ่าย (IFF)</text>
+        <rect x="290" y="180" width="200" height="38" rx="10" class="bx"/><text x="390" y="204" class="mid">ติดตาม + คำนวณวิถีน้ำ</text>
+        <rect x="290" y="230" width="200" height="38" rx="10" class="bx"/><text x="390" y="254" class="mid">ควบคุมการฉีด</text>
+        <path class="w" d="M390 118V130M390 168V180M390 218V230"/>
+        <path class="fl" d="M190 78H270M190 158H270M190 238H270"/>
+        <path class="fl" d="M510 78H590M510 158H590M510 238H590"/>
+        <g>
+          <rect x="590" y="50" width="170" height="56" rx="14" class="bx"/><text x="606" y="74">มอเตอร์ Pan/Tilt</text><text x="606" y="94" class="ts">หมุนหัวป้อม</text>
+          <rect x="590" y="130" width="170" height="56" rx="14" class="bx"/><text x="606" y="154">ปั๊ม + วาล์ว</text><text x="606" y="174" class="ts">เปิดปิดสายน้ำ</text>
+          <rect x="590" y="210" width="170" height="56" rx="14" class="bx"/><text x="606" y="234">แอปมือถือ</text><text x="606" y="254" class="ts">แจ้งเตือน + อนุมัติ</text>
+        </g>
+        <path class="fl p12" d="M695 330V305H105M105 305V266M390 305V286M675 305V266"/>
+        <rect x="20" y="330" width="170" height="56" rx="14" class="bxy"/><text x="36" y="363">แผงโซลาร์เซลล์</text>
+        <rect x="235" y="330" width="170" height="56" rx="14" class="bxy"/><text x="251" y="363">ตัวควบคุมการชาร์จ</text>
+        <rect x="450" y="330" width="150" height="56" rx="14" class="bxy"/><text x="466" y="363">แบตเตอรี่ 12V</text>
+        <rect x="630" y="330" width="130" height="56" rx="14" class="bxy"/><text x="646" y="363">จ่ายไฟ 12V/5V</text>
+        <path class="fl p12" d="M190 358H235M405 358H450M600 358H630"/>
+        <text x="20" y="420" class="ts">ระบบพลังงาน: ทำงานได้เองโดยไม่ต้องเสียบปลั๊ก</text>
+      </svg>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>รับข้อมูล</h3><p>กล้อง 2 ตัวทำงานคู่กัน ตัวมุมกว้างหาเป้า ตัวติดตามมองเป้าใกล้ๆ และเห็นสายน้ำของตัวเอง</p></div></div>
+      <div class="note rv"><span class="k c">2</span><div><h3>ประมวลผลบนเครื่อง</h3><p>AI รันบน Raspberry Pi เลย ไม่ต้องส่งภาพขึ้นคลาวด์ ตอบสนองเร็วและไม่มีปัญหาเรื่องความเป็นส่วนตัว ขั้น IFF ต้องผ่านก่อนทุกครั้งถึงจะสั่งฉีดได้</p></div></div>
+      <div class="note rv"><span class="k">3</span><div><h3>สั่งงาน</h3><p>หมุนหัวป้อม เปิดน้ำ และส่งแจ้งเตือนเข้าแอป</p></div></div>
+      <div class="note rv"><span class="k y">4</span><div><h3>พลังงาน</h3><p>ใช้โซลาร์เซลล์กับแบตเตอรี่ ติดตั้งระเบียงไหนก็ได้</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MECH -->
+<section class="slide" aria-label="ออกแบบโครงสร้าง">
+  <div class="tag rv"><b>06</b>ออกแบบโครงสร้าง</div>
+  <h2 class="rv">แบบด้านข้างของตัวป้อม</h2>
+  <div class="split">
+    <div class="fig rv">
+      <svg class="dg" viewBox="0 0 620 470" role="img" aria-label="แบบด้านข้างของป้อม CIWS พร้อมหมายเลขชิ้นส่วน">
+        <line x1="40" y1="440" x2="600" y2="440" class="w"/>
+        <path class="fl" d="M419 145Q520 70 600 178"/>
+        <text x="470" y="70" class="ts">ระยะฉีด 6–8 ม.</text>
+        <rect x="190" y="420" width="190" height="20" rx="6" class="bx"/>
+        <rect x="258" y="250" width="44" height="170" rx="8" class="bx"/>
+        <rect x="266" y="330" width="28" height="44" rx="4" class="bxw" stroke-dasharray="4 3"/>
+        <rect x="390" y="330" width="90" height="110" rx="12" class="bx"/>
+        <rect x="394" y="362" width="82" height="74" rx="9" fill="var(--water-soft)"/>
+        <rect x="468" y="340" width="8" height="26" rx="3" fill="var(--lock)"/>
+        <path class="w" d="M390 425H302"/>
+        <rect x="226" y="270" width="32" height="20" rx="4" fill="#24303a"/><circle cx="234" cy="280" r="4" fill="var(--sun)"/>
+        <rect x="244" y="232" width="72" height="18" rx="6" class="bxy"/>
+        <path class="dim draw" pathLength="1" d="M232 262A50 10 0 0 0 328 262" marker-end="url(#ar)"/>
+        <text x="334" y="270" class="ts">Pan 360°</text>
+        <circle cx="280" cy="190" r="44" fill="#fff" stroke="#c8d5de" stroke-width="2"/>
+        <circle cx="280" cy="190" r="5" fill="#9aa8b2"/>
+        <rect x="258" y="128" width="46" height="22" rx="5" fill="#24303a"/><circle cx="296" cy="139" r="5" fill="var(--sun)"/>
+        <g transform="rotate(-18 280 190)"><rect x="300" y="182" width="120" height="16" rx="6" fill="#3a4650"/><rect x="414" y="179" width="12" height="22" rx="3" fill="var(--water)"/></g>
+        <path class="dim draw" pathLength="1" d="M349 202A70 70 0 0 0 304 124" marker-end="url(#ar)"/>
+        <text x="312" y="112" class="ts">Tilt −10° ถึง +70°</text>
+        <path class="dim" d="M150 128V440M144 128H156M144 440H156"/>
+        <text x="138" y="290" class="ts mid" transform="rotate(-90 138 290)">สูงรวมประมาณ 55 ซม.</text>
+        <g class="co"><circle cx="232" cy="122" r="12"/><text x="232" y="122" class="tw">1</text></g>
+        <g class="co"><circle cx="204" cy="280" r="12"/><text x="204" y="280" class="tw">2</text></g>
+        <g class="co"><circle cx="216" cy="196" r="12"/><text x="216" y="196" class="tw">3</text></g>
+        <g class="co"><circle cx="392" cy="196" r="12"/><text x="392" y="196" class="tw">4</text></g>
+        <g class="co"><circle cx="240" cy="352" r="12"/><text x="240" y="352" class="tw">5</text></g>
+        <g class="co"><circle cx="505" cy="390" r="12"/><text x="505" y="390" class="tw">6</text></g>
+      </svg>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>กล้องติดตาม</h3><p>อยู่บนหัวป้อม หมุนไปพร้อมหัวฉีด จึงเห็นทั้งนกและสายน้ำในภาพเดียว ใช้ปรับเล็งแบบวงปิด</p></div></div>
+      <div class="note rv"><span class="k">2</span><div><h3>กล้องมุมกว้าง</h3><p>ยึดกับเสา ไม่หมุน เฝ้าทั้งพื้นที่ตลอดเวลา</p></div></div>
+      <div class="note rv"><span class="k">3</span><div><h3>หัวป้อม pan-tilt</h3><p>สเต็ปเปอร์ 2 ตัว หมุนรอบตัว 360° และก้มเงยได้ มีโดมครอบกันฝน</p></div></div>
+      <div class="note rv"><span class="k">4</span><div><h3>หัวฉีด</h3><p>ปรับได้ทั้งแบบลำและแบบฝอย ฉีดได้ไกล 6–8 ม.</p></div></div>
+      <div class="note rv"><span class="k">5</span><div><h3>ปั๊มในเสา</h3><p>ปั๊มไดอะแฟรม 12V กับโซลินอยด์วาล์ว ซ่อนอยู่ในเสาเพื่อกันน้ำและแดด</p></div></div>
+      <div class="note rv"><span class="k">6</span><div><h3>ถังน้ำ</h3><p>5–10 ลิตร มีลูกลอยวัดระดับน้ำ ใกล้หมดจะแจ้งให้เติม</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WIRING -->
+<section class="slide" aria-label="วงจรไฟฟ้า">
+  <div class="tag rv"><b>07</b>ออกแบบวงจร</div>
+  <h2 class="rv">ผังการต่อสายไฟ</h2>
+  <div class="split">
+    <div class="fig rv">
+      <svg class="dg" viewBox="0 0 780 470" role="img" aria-label="ผังวงจรไฟฟ้าของระบบ">
+        <rect x="290" y="40" width="180" height="290" rx="18" class="bxw"/>
+        <text x="380" y="70" class="hd mid">Raspberry Pi 5</text>
+        <text x="380" y="92" class="ts mid">GPIO 3.3V</text>
+        <rect x="20" y="150" width="180" height="44" rx="12" class="bx"/><text x="36" y="177">กล้องติดตาม</text>
+        <rect x="20" y="215" width="180" height="44" rx="12" class="bx"/><text x="36" y="242">กล้องมุมกว้าง</text>
+        <rect x="20" y="280" width="180" height="44" rx="12" class="bx"/><text x="36" y="307">ชิป AI (Hailo-8L)</text>
+        <path class="fl" d="M200 172H290M200 237H290M200 302H290"/>
+        <text x="245" y="164" class="ts mid">CSI</text><text x="245" y="229" class="ts mid">CSI</text><text x="245" y="294" class="ts mid">PCIe</text>
+        <rect x="560" y="40" width="200" height="44" rx="12" class="bx"/><text x="572" y="67">สเต็ปเปอร์ Pan + TMC2209</text>
+        <rect x="560" y="100" width="200" height="44" rx="12" class="bx"/><text x="572" y="127">สเต็ปเปอร์ Tilt + TMC2209</text>
+        <rect x="560" y="160" width="200" height="44" rx="12" class="bx"/><text x="572" y="187">MOSFET → ปั๊ม 12V</text>
+        <rect x="560" y="220" width="200" height="44" rx="12" class="bx"/><text x="572" y="247">MOSFET → วาล์ว + ไดโอด</text>
+        <rect x="560" y="280" width="200" height="44" rx="12" class="bx"/><text x="572" y="307">ลูกลอยวัดระดับน้ำ</text>
+        <path class="fl" d="M470 56H560M470 116H560M470 176H560M470 236H560M560 296H470"/>
+        <text x="476" y="50" class="ts">GPIO 17, 27</text><text x="476" y="110" class="ts">GPIO 22, 23</text><text x="476" y="170" class="ts">GPIO 24</text><text x="476" y="230" class="ts">GPIO 25</text><text x="476" y="290" class="ts">GPIO 5</text>
+        <rect x="20" y="380" width="170" height="44" rx="12" class="bxy"/><text x="36" y="407">แบตเตอรี่ 12V</text>
+        <rect x="245" y="380" width="150" height="44" rx="12" class="bxy"/><text x="261" y="407">Buck 12V → 5V</text>
+        <path class="fl p12" d="M190 396H245"/>
+        <path class="fl p5" d="M320 380V330"/>
+        <path class="fl p12" d="M105 424V448H548V74M548 74H560M548 134H560M548 194H560M548 254H560"/>
+        <g transform="translate(600 360)">
+          <line x1="0" y1="0" x2="26" y2="0" class="fl"/><text x="34" y="5" class="ts">สัญญาณ</text>
+          <line x1="0" y1="22" x2="26" y2="22" class="fl p12"/><text x="34" y="27" class="ts">ไฟ 12V</text>
+          <line x1="0" y1="44" x2="26" y2="44" class="fl p5"/><text x="34" y="49" class="ts">ไฟ 5V</text>
+        </g>
+      </svg>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>Pi เป็นศูนย์กลาง</h3><p>รับภาพจากกล้องผ่านพอร์ต CSI และใช้ชิป AI ผ่าน PCIe เพื่อให้ตรวจจับวัตถุได้หลายสิบเฟรมต่อวินาที</p></div></div>
+      <div class="note rv"><span class="k c">2</span><div><h3>ทำไมต้องมี MOSFET</h3><p>ขา GPIO จ่ายไฟได้แค่ 3.3V กระแสน้อย ขับปั๊ม 12V ตรงๆ ไม่ได้ จึงใช้ MOSFET เป็นสวิตช์ และใส่ไดโอดกันไฟย้อนจากขดลวดวาล์ว</p></div></div>
+      <div class="note rv"><span class="k">3</span><div><h3>ไดรเวอร์ TMC2209</h3><p>ขับสเต็ปเปอร์ได้เงียบ นกจะไม่ตกใจเสียงมอเตอร์ก่อนโดนน้ำ</p></div></div>
+      <div class="note rv"><span class="k y">4</span><div><h3>แหล่งไฟเดียว</h3><p>แบตเตอรี่ 12V จ่ายให้มอเตอร์และปั๊มโดยตรง แล้วแปลงเป็น 5V ให้ Pi ผ่าน buck converter</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATE MACHINE -->
+<section class="slide" aria-label="ออกแบบซอฟต์แวร์">
+  <div class="tag rv"><b>08</b>ออกแบบซอฟต์แวร์</div>
+  <h2 class="rv">สถานะการทำงานของโปรแกรม</h2>
+  <div class="split">
+    <div class="fig rv">
+      <svg class="dg sm" viewBox="0 0 780 380" role="img" aria-label="แผนภาพสถานะของโปรแกรมควบคุม">
+        <path class="dim" d="M152 70H169" marker-end="url(#ar)"/><path class="dim" d="M297 70H314" marker-end="url(#ar)"/><path class="dim" d="M442 70H459" marker-end="url(#ar)"/>
+        <path class="dim" d="M587 70H614" stroke-dasharray="4 4" marker-end="url(#ar)"/>
+        <text x="600" y="38" class="ts mid">ควบคุมเอง</text>
+        <path class="dim" d="M680 94V172" marker-end="url(#ar)"/>
+        <path class="dim" d="M560 94L636 172" marker-end="url(#ar)"/>
+        <text x="612" y="128" class="ts">อัตโนมัติ</text>
+        <path class="dim" d="M640 224L572 294" marker-end="url(#ar)"/>
+        <text x="618" y="272" class="ts">ฉีดเสร็จ</text>
+        <path class="dim" d="M463 320H90V98" marker-end="url(#ar)"/>
+        <text x="200" y="312" class="ts">นกบินไปแล้ว</text>
+        <path class="dim" d="M525 296V98" marker-end="url(#ar)"/>
+        <text x="532" y="262" class="ts">ยังอยู่</text>
+        <path class="draw" pathLength="1" d="M380 94V172" stroke="var(--coral)" stroke-width="2" fill="none" marker-end="url(#arC)"/>
+        <text x="388" y="140" class="ts">เจอสัตว์เลี้ยง</text>
+        <path class="draw" pathLength="1" d="M618 206H446" stroke="var(--coral)" stroke-width="2" fill="none" marker-end="url(#arC)"/>
+        <text x="458" y="228" class="ts">สัตว์เลี้ยงเข้ามาระหว่างฉีด</text>
+        <path class="dim" d="M425 176L492 98" stroke="var(--leaf)" marker-end="url(#arG)"/>
+        <text x="452" y="160" class="ts">ปลอดภัยแล้ว</text>
+        <g class="nd" style="--s:0"><rect x="28" y="46" width="124" height="48" rx="24"/><text x="90" y="75" class="mid">เฝ้าระวัง</text></g>
+        <g class="nd" style="--s:1"><rect x="173" y="46" width="124" height="48" rx="24"/><text x="235" y="75" class="mid">ตรวจพบ</text></g>
+        <g class="nd" style="--s:2"><rect x="318" y="46" width="124" height="48" rx="24"/><text x="380" y="75" class="mid">ระบุฝ่าย</text></g>
+        <g class="nd" style="--s:3"><rect x="463" y="46" width="124" height="48" rx="24"/><text x="525" y="75" class="mid">ล็อกเป้า</text></g>
+        <g class="await"><rect x="618" y="46" width="124" height="48" rx="24"/><text x="680" y="75" class="mid">รออนุมัติ</text></g>
+        <g class="nd" style="--s:4"><rect x="618" y="176" width="124" height="48" rx="24"/><text x="680" y="205" class="mid">ฉีดน้ำ</text></g>
+        <g class="nd" style="--s:5"><rect x="463" y="296" width="124" height="48" rx="24"/><text x="525" y="325" class="mid">ประเมินผล</text></g>
+        <g class="hold"><rect x="318" y="176" width="124" height="48" rx="24"/><text x="380" y="205" class="mid">งดฉีด</text></g>
+      </svg>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>เส้นทางปกติ</h3><p>เฝ้าระวัง → ตรวจพบ → ระบุฝ่าย → ล็อกเป้า → ฉีดน้ำ → ประเมินผล แล้ววนกลับ (กรอบที่สว่างไล่ตามลำดับ)</p></div></div>
+      <div class="note rv"><span class="k c">2</span><div><h3>"งดฉีด" สำคัญที่สุด</h3><p>เข้าได้จากหลายสถานะ แม้กำลังฉีดอยู่ ถ้ามีสัตว์เลี้ยงหรือคนเข้ามาก็หยุดทันที และจะกลับไปล็อกเป้าเมื่อพื้นที่ปลอดภัยแล้ว</p></div></div>
+      <div class="note rv"><span class="k y">3</span><div><h3>โหมดควบคุมเอง</h3><p>เพิ่มสถานะ "รออนุมัติ" ระหว่างล็อกเป้ากับฉีดน้ำ ให้เจ้าของกดยืนยันในแอปก่อน</p></div></div>
+      <div class="note rv"><span class="k g">4</span><div><h3>ทำไมใช้ state machine</h3><p>แต่ละสถานะมีกฎชัดเจน ทดสอบง่าย และพิสูจน์ได้ว่าไม่มีทางไปถึง "ฉีดน้ำ" โดยไม่ผ่าน "ระบุฝ่าย"</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AIM MATH -->
+<section class="slide" aria-label="การคำนวณการเล็ง">
+  <div class="tag rv"><b>09</b>ออกแบบการเล็ง</div>
+  <h2 class="rv">เล็งยังไงให้น้ำโดนนกที่กำลังบิน</h2>
+  <div class="split">
+    <div class="fig rv">
+      <svg class="dg" viewBox="0 0 640 400" role="img" aria-label="แผนภาพการคำนวณจุดดักหน้าและการชดเชยน้ำตก">
+        <line x1="20" y1="370" x2="620" y2="370" class="w"/>
+        <rect x="58" y="330" width="24" height="40" rx="5" fill="#8796a2"/>
+        <circle cx="70" cy="322" r="22" fill="#fff" stroke="#c8d5de" stroke-width="2"/>
+        <line x1="70" y1="322" x2="97" y2="300" stroke="#3a4650" stroke-width="9" stroke-linecap="round"/>
+        <path class="dim" d="M97 300L400 60" stroke-dasharray="6 6"/>
+        <text x="236" y="150" class="ts" transform="rotate(-38 236 150)">แนวเล็ง</text>
+        <path class="draw" pathLength="1" d="M97 300Q248 180 400 140" stroke="var(--water)" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path class="fl" d="M97 300Q248 180 400 140"/>
+        <text x="250" y="250" class="ts" fill="var(--water)">วิถีน้ำ (โค้งลงเพราะแรงโน้มถ่วง)</text>
+        <path d="M400 64V132" stroke="var(--coral)" stroke-width="2" fill="none" marker-end="url(#arC)"/>
+        <text x="392" y="122" class="ts" text-anchor="end">น้ำตกลง ½gt²</text>
+        <circle cx="400" cy="60" r="5" fill="var(--coral)"/>
+        <circle cx="400" cy="140" r="16" fill="none" stroke="var(--lock)" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="352" y="180" class="ts">จุดดักหน้า</text>
+        <path d="M506 124L424 138" stroke="var(--muted)" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+        <text x="470" y="160" class="ts">นกบินไป v × t</text>
+        <g transform="translate(530 116)">
+          <ellipse cx="0" cy="0" rx="20" ry="13" fill="#8b96a6"/><circle cx="-17" cy="-9" r="8" fill="#6b7889"/>
+          <path d="M-25 -9L-32 -7L-25 -5Z" fill="#e0a040"/><ellipse cx="6" cy="-10" rx="16" ry="7" fill="#a3adbb"/>
+        </g>
+      </svg>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>เวลาที่น้ำเดินทาง</h3><p class="formula">t = ระยะ ÷ ความเร็วน้ำ</p></div></div>
+      <div class="note rv"><span class="k y">2</span><div><h3>เล็งดักหน้า</h3><p class="formula">จุดดัก = ตำแหน่งนก + ความเร็วนก × t</p></div></div>
+      <div class="note rv"><span class="k c">3</span><div><h3>ชดเชยน้ำตก</h3><p class="formula">เล็งสูงขึ้น ½ × g × t²</p></div></div>
+      <p class="example rv">ตัวอย่าง: นกอยู่ห่าง <b>8 ม.</b> น้ำพุ่ง <b>12 ม./วินาที</b> → ใช้เวลา <b>0.67 วินาที</b> → น้ำตกลง <b>2.2 ม.</b> ต้องเล็งสูงขึ้นเท่านี้</p>
+      <div class="note rv"><span class="k g">4</span><div><h3>ปรับเล็งแบบวงปิด (ตัวอย่าง)</h3><p>กล้องวัดว่าน้ำพลาดไปเท่าไหร่ แล้วลดความคลาดเคลื่อนลงทุกชุด</p>
+        <div class="bars">
+          <div class="bar"><span>ชุดที่ 1</span><i style="--w:100%;--d:0"></i><span>4.0°</span></div>
+          <div class="bar"><span>ชุดที่ 2</span><i style="--w:35%;--d:1"></i><span>1.4°</span></div>
+          <div class="bar"><span>ชุดที่ 3</span><i style="--w:12%;--d:2"></i><span>0.5°</span></div>
+        </div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 SIM -->
+<section class="slide" id="simSlide" aria-label="แบบจำลอง 3 มิติ">
+  <div class="tag rv"><b>10</b>แบบจำลอง</div>
+  <h2 class="rv">ดูระบบทำงานจริง</h2>
+  <div class="sim-grid rv">
+    <div id="stage">
+      <canvas id="overlay"></canvas>
+      <div class="hud">
+        <div class="chip" id="chip" data-s="SEARCH"><i></i><span id="chipTxt">เฝ้าระวัง</span></div>
+        <div class="line">เป้า: <b id="hTgt">–</b></div>
+        <div class="line">ความคลาดเคลื่อนการเล็ง: <b id="hErr">–</b></div>
+        <div class="line">IFF: <b id="hIff">พื้นที่ปลอดภัย</b></div>
+      </div>
+      <div class="clock" id="clock">T+00:00.0</div>
+      <div class="draghint">ลากเพื่อหมุนมุมกล้อง</div>
+      <div class="fallback" id="fallback">โหลดแบบจำลอง 3 มิติไม่สำเร็จ ตรวจการเชื่อมต่ออินเทอร์เน็ตแล้วรีเฟรชหน้านี้</div>
+    </div>
+    <div class="side">
+      <div class="box">
+        <h4>สถานการณ์</h4>
+        <div class="btns">
+          <button id="bBird">ปล่อยนก 1 ตัว</button>
+          <button id="bFlock">ฝูงนก 3 ตัว</button>
+          <button id="bCat" class="wide">ให้แมวเดินผ่าน (ทดสอบ IFF)</button>
+        </div>
+        <label class="check"><input type="checkbox" id="auto" checked> สุ่มเหตุการณ์อัตโนมัติ</label>
+      </div>
+      <div class="box">
+        <h4>โหมดยิง</h4>
+        <div class="seg" role="group" aria-label="โหมดยิง">
+          <button id="mAuto" aria-pressed="true">อัตโนมัติ</button>
+          <button id="mMan" aria-pressed="false">ควบคุมเอง</button>
+        </div>
+        <button id="fire" disabled>อนุมัติยิง</button>
+      </div>
+      <div class="box">
+        <h4>สถิติ</h4>
+        <div class="stats">
+          <div class="stat"><div class="v" id="sHit">0</div><div class="l">ไล่นกสำเร็จ (ตัว)</div></div>
+          <div class="stat"><div class="v" id="sWater">0</div><div class="l">น้ำที่ใช้ (มล.)</div></div>
+          <div class="stat"><div class="v" id="sResp">–</div><div class="l">เวลาตอบสนองเฉลี่ย (วินาที)</div></div>
+          <div class="stat"><div class="v" id="sHold">0</div><div class="l">งดยิงเพราะ IFF (ครั้ง)</div></div>
+        </div>
+      </div>
+      <div class="box">
+        <h4>บันทึกเหตุการณ์</h4>
+        <ul id="log"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" aria-label="กฎการทำงาน">
+  <div class="tag rv"><b>11</b>กฎการทำงาน</div>
+  <h2 class="rv">ไล่ให้ได้ผล แต่ไม่ทำร้ายใคร</h2>
+  <div class="cards">
+    <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/></svg></div><h3>แรงดันต่ำ แค่ไล่</h3><p>นกหลายชนิดในไทยเป็นสัตว์คุ้มครอง ระบบจึงออกแบบให้นกตกใจแต่ไม่บาดเจ็บ</p></div>
+    <div class="card c rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg></div><h3>เห็นคนหรือสัตว์เลี้ยง ห้ามฉีด</h3><p>ตรวจทุกเฟรม แม้กำลังฉีดอยู่ ถ้ามีแมวหรือคนเข้ามาในภาพก็หยุดทันที</p></div>
+    <div class="card y rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h.01M15 15h.01M15 9h.01M9 15h.01"/></svg></div><h3>สุ่มรูปแบบทุกครั้ง</h3><p>จังหวะ ความยาว และมุม เปลี่ยนตลอด นกจึงจับรูปแบบไม่ได้และไม่ชินเหมือนหุ่นไล่กา</p></div>
+    <div class="card g rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div><h3>เจ้าของตัดสินใจได้</h3><p>โหมดควบคุมเอง ระบบล็อกเป้าแล้วส่งภาพให้เจ้าของกดอนุมัติในแอป</p></div>
+  </div>
+</section>
+
+<!-- APP -->
+<section class="slide" aria-label="ออกแบบแอปมือถือ">
+  <div class="tag rv"><b>12</b>ออกแบบแอป</div>
+  <h2 class="rv">แอปมือถือสำหรับเจ้าของ</h2>
+  <div class="split">
+    <div class="rv" style="display:grid;justify-items:center">
+      <div class="phone">
+        <div class="screen">
+          <div class="toast"><span class="ti"></span><div><b>พบนกพิราบ 2 ตัว</b>ที่ราวระเบียง · กำลังล็อกเป้า</div></div>
+          <div class="sbar"><span>09:41</span><span>5G 87%</span></div>
+          <div class="ahead"><b>CIWS · ระเบียงห้อง 1204</b><span class="on">ออนไลน์</span></div>
+          <div class="live">
+            <span class="lbl">ภาพสด</span>
+            <svg viewBox="0 0 160 100" aria-hidden="true">
+              <rect x="0" y="70" width="160" height="30" fill="#dfe7ec"/>
+              <line x1="0" y1="58" x2="160" y2="58" stroke="#8fa3b0" stroke-width="2.5"/>
+              <g stroke="#8fa3b0" stroke-width="1.5"><line x1="20" y1="58" x2="20" y2="70"/><line x1="50" y1="58" x2="50" y2="70"/><line x1="80" y1="58" x2="80" y2="70"/><line x1="110" y1="58" x2="110" y2="70"/><line x1="140" y1="58" x2="140" y2="70"/></g>
+              <g transform="translate(96 49)"><ellipse rx="9" ry="6" fill="#8b96a6"/><circle cx="-8" cy="-4" r="3.6" fill="#6b7889"/><ellipse cx="2" cy="-4" rx="7" ry="3" fill="#a3adbb"/></g>
+              <rect x="80" y="36" width="32" height="24" fill="none" stroke="#f2694b" stroke-width="1.5"/>
+              <text x="80" y="33" font-size="7" fill="#f2694b" font-family="Mitr,sans-serif">นก 94%</text>
+            </svg>
+          </div>
+          <div class="abtn"><span>อนุมัติฉีด</span><span>ข้าม</span></div>
+          <div class="mini">
+            <div class="r"><span>วันนี้ไล่ไป</span><b>23 ครั้ง</b></div>
+            <div class="hist"><i style="height:30%"></i><i class="pk" style="height:100%"></i><i class="pk" style="height:85%"></i><i style="height:40%"></i><i style="height:20%"></i><i style="height:15%"></i><i style="height:25%"></i><i style="height:55%"></i><i style="height:70%"></i><i style="height:35%"></i><i style="height:10%"></i><i style="height:5%"></i></div>
+            <div class="hlab"><span>06:00</span><span>12:00</span><span>18:00</span></div>
+          </div>
+          <div class="mini">
+            <div class="r"><span>น้ำในถัง</span><b>62%</b></div>
+            <div class="tankbar"><i></i></div>
+          </div>
+        </div>
+      </div>
+      <p class="mocknote">ตัวอย่างหน้าจอ ตัวเลขเป็นข้อมูลสมมติ</p>
+    </div>
+    <div class="notes">
+      <div class="note rv"><span class="k">1</span><div><h3>แจ้งเตือนทันที</h3><p>เจอนกเมื่อไหร่ส่งแจ้งเตือนพร้อมภาพเข้ามือถือ</p></div></div>
+      <div class="note rv"><span class="k c">2</span><div><h3>ดูภาพสดและอนุมัติ</h3><p>ในโหมดควบคุมเอง เห็นกรอบล็อกเป้าแล้วกด "อนุมัติฉีด" หรือ "ข้าม" ได้</p></div></div>
+      <div class="note rv"><span class="k">3</span><div><h3>สถิติรายวัน</h3><p>กราฟบอกช่วงเวลาที่นกมาบ่อย เช่น ช่วงเช้าตรู่ ใช้วางแผนเติมน้ำหรือปรับความไวของระบบได้</p></div></div>
+      <div class="note rv"><span class="k y">4</span><div><h3>เตือนเติมน้ำ</h3><p>ข้อมูลจากลูกลอยในถัง แจ้งก่อนน้ำหมดจะได้ไม่ขาดช่วง</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="slide" aria-label="อุปกรณ์">
+  <div class="tag rv"><b>13</b>อุปกรณ์</div>
+  <h2 class="rv">ทุกชิ้นมีขายทั่วไป ประกอบได้จริง</h2>
+  <div class="hw">
+    <div class="box rv"><h4>ตรวจจับ</h4><ul>
+      <li><b>กล้องมุมกว้าง</b>เฝ้าทั้งพื้นที่</li>
+      <li><b>กล้องบนฐานหมุน</b>ติดตามเป้าและดูสายน้ำ</li>
+      <li><b>เซนเซอร์ระดับน้ำ</b>วัดน้ำที่เหลือในถัง</li></ul></div>
+    <div class="box rv"><h4>ประมวลผล</h4><ul>
+      <li><b>Raspberry Pi 5 + ชิปเร่ง AI</b>รันโมเดลตรวจจับวัตถุ แยกนก คน แมว หมา</li>
+      <li><b>Wi-Fi</b>ส่งภาพและสถิติขึ้นแอปมือถือ</li></ul></div>
+    <div class="box rv"><h4>ขับเคลื่อน</h4><ul>
+      <li><b>ฐานหมุน pan-tilt</b>สเต็ปเปอร์มอเตอร์ 2 แกน</li>
+      <li><b>ปั๊มน้ำ 12V + โซลินอยด์วาล์ว</b>เปิดปิดสายน้ำเป็นช่วงสั้นๆ</li>
+      <li><b>หัวฉีด + ถังน้ำ 5–10 ลิตร</b>"แม็กกาซีน" ของระบบ</li></ul></div>
+    <div class="box rv"><h4>พลังงาน</h4><ul>
+      <li><b>แผงโซลาร์เซลล์</b>ติดตั้งได้โดยไม่ต้องเดินสายไฟ</li>
+      <li><b>แบตเตอรี่ LiFePO4</b>ทำงานต่อได้ตอนกลางคืน</li></ul></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" aria-label="แผนต่อยอด">
+  <div class="tag rv"><b>14</b>แผนต่อยอด</div>
+  <h2 class="rv">จากระเบียงเดียว สู่ทั้งเมือง</h2>
+  <div class="cards">
+    <div class="card rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 11l10-4M7 13l10 4"/></svg></div><h3>ป้องกันทั้งอาคาร</h3><p>ติดหลายตัวทั่วคอนโดแล้วแชร์ข้อมูลเป้ากัน ตัวที่เห็นก่อนส่งต่อให้ตัวที่ใกล้กว่าจัดการ</p></div>
+    <div class="card y rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 18l5-6 4 3 7-9"/></svg></div><h3>เรียนรู้เอง</h3><p>เก็บข้อมูลว่ามุมและจังหวะแบบไหนไล่นกได้ผลที่สุด แล้วปรับรูปแบบเอง</p></div>
+    <div class="card g rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="14" r="6"/><path d="M12 8c0-3 2-5 5-5 0 3-2 5-5 5z"/></svg></div><h3>เวอร์ชันสวนผลไม้</h3><p>วางรอบสวนมะม่วงหรือลำไย ป้องกันนกและกระรอกช่วงผลผลิตใกล้เก็บ</p></div>
+    <div class="card c rv"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 16l20-6-2-2-7 2-5-6H6l3 7-5 1-2-2z"/></svg></div><h3>เวอร์ชันสนามบิน</h3><p>นกชนเครื่องบินเป็นปัญหาความปลอดภัยการบินจริง ต่อยอดเป็นระบบไล่นกรอบรันเวย์</p></div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide end" aria-label="สรุป">
+  <div class="drops" id="drops"></div>
+  <div class="tag rv"><b>สรุป</b>Project CIWS</div>
+  <h2 class="rv">มองเห็นเอง ตัดสินใจเอง<br>ไล่เอง และไม่ทำร้ายใคร</h2>
+  <p class="lead rv">นำหลักการของระบบป้องกันเรือรบมาใช้กับปัญหาในชีวิตประจำวัน ด้วยอุปกรณ์ที่หาซื้อได้ทั่วไป</p>
+  <div class="qa rv">ขอบคุณ · ถาม-ตอบ</div>
+</section>
+</main>
+
+<nav class="dots" id="dots" aria-label="สไลด์"></nav>
+<div class="ctrl">
+  <button class="fsb" id="fs">เต็มจอ</button>
+  <button id="prev" aria-label="สไลด์ก่อนหน้า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span class="count" id="count">1 / 10</span>
+  <button id="next" aria-label="สไลด์ถัดไป"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = {water:css('--water'),coral:css('--coral'),leaf:css('--leaf'),lock:css('--lock'),ink:css('--ink'),muted:css('--muted'),sun:css('--sun')};
+
+/* ---------- deck: one slide at a time, depth transitions ---------- */
+const slides=[...document.querySelectorAll('.slide')];
+slides.forEach(s=>[...s.querySelectorAll('.rv')].forEach((e,i)=>e.style.setProperty('--i',i)));
+const dots=document.getElementById('dots'),count=document.getElementById('count'),prog=document.getElementById('prog');
+slides.forEach((s,i)=>{const b=document.createElement('button');b.setAttribute('aria-label','ไปสไลด์ '+(i+1));b.addEventListener('click',()=>go(i));dots.appendChild(b);});
+let cur=0;
+function go(i){
+  i=Math.max(0,Math.min(slides.length-1,i));
+  cur=i;
+  slides.forEach((s,k)=>{s.classList.toggle('on',k===i);s.classList.toggle('past',k<i);s.setAttribute('aria-hidden',k===i?'false':'true');if(k===i)s.scrollTop=0;});
+  [...dots.children].forEach((d,k)=>d.setAttribute('aria-current',k===i?'true':'false'));
+  count.textContent=(i+1)+' / '+slides.length;
+  prog.style.width=((i+1)/slides.length*100)+'%';
+  onSlide(i);
+}
+document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+document.getElementById('next').addEventListener('click',()=>go(cur+1));
+function fullscreen(){try{const p=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+document.getElementById('fs').addEventListener('click',fullscreen);
+document.addEventListener('keydown',e=>{
+  const onCtl=e.target.closest&&e.target.closest('button,input');
+  if(['ArrowRight','ArrowDown','PageDown'].includes(e.key)||(e.key===' '&&!onCtl)){e.preventDefault();go(cur+1);}
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();go(cur-1);}
+  else if(e.key==='Home'){e.preventDefault();go(0);}
+  else if(e.key==='End'){e.preventDefault();go(slides.length-1);}
+  else if((e.key==='f'||e.key==='F')&&!onCtl)fullscreen();
+});
+let sw=null;
+document.getElementById('deck').addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||e.target.closest('#stage,button,input'))return;sw={x:e.clientX,y:e.clientY};});
+document.getElementById('deck').addEventListener('pointerup',e=>{if(!sw)return;const dx=e.clientX-sw.x,dy=e.clientY-sw.y;sw=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)go(cur+(dx<0?1:-1));});
+
+/* droplets on last slide */
+const drops=document.getElementById('drops');
+for(let i=0;i<18;i++){const d=document.createElement('i');d.style.left=(Math.random()*100)+'%';d.style.animationDuration=(7+Math.random()*8)+'s';d.style.animationDelay=(-Math.random()*12)+'s';d.style.setProperty('--dx',(Math.random()*80-40)+'px');const s=.5+Math.random()*1.2;d.style.transform=`scale(${s})`;drops.appendChild(d);}
+
+/* ---------- hero animation: turret sprays a pigeon away ---------- */
+const hc=document.getElementById('heroCv'),hx=hc.getContext('2d');
+let heroOn=true,hW=0,hH=0,hd=1;
+function sizeHero(){hd=Math.min(devicePixelRatio,2);hW=hc.clientWidth;hH=hc.clientHeight;hc.width=hW*hd;hc.height=hH*hd;}
+const drp=[];const LOOP=7.5;
+function lerp(a,b,t){return a+(b-a)*t}
+function ease(t){return t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2}
+function drawBird(x,y,flap,s,flip){
+  hx.save();hx.translate(x,y);hx.scale(flip?-s:s,s);
+  hx.fillStyle='#8b96a6';hx.beginPath();hx.ellipse(0,0,26,17,-.15,0,7);hx.fill();
+  hx.fillStyle='#6b7889';hx.beginPath();hx.arc(-22,-12,11,0,7);hx.fill();
+  hx.fillStyle='#7fc4a8';hx.beginPath();hx.ellipse(-16,-3,7,5,0,0,7);hx.fill();
+  hx.fillStyle='#e0a040';hx.beginPath();hx.moveTo(-33,-12);hx.lineTo(-41,-9);hx.lineTo(-33,-8);hx.fill();
+  hx.fillStyle='#17324a';hx.beginPath();hx.arc(-25,-14,2,0,7);hx.fill();
+  hx.fillStyle='#6b7889';hx.beginPath();hx.moveTo(22,-2);hx.lineTo(40,-8);hx.lineTo(38,6);hx.fill();
+  hx.save();hx.translate(2,-6);hx.scale(1,flap);hx.fillStyle='#a3adbb';hx.beginPath();hx.ellipse(8,-10,22,11,-.3,0,7);hx.fill();hx.restore();
+  if(flap>.9||flap<-.5){}else{hx.strokeStyle='#d08a2f';hx.lineWidth=2.5;hx.beginPath();hx.moveTo(-4,15);hx.lineTo(-4,24);hx.moveTo(6,15);hx.lineTo(6,24);hx.stroke();}
+  hx.restore();
+}
+function drawHero(t){
+  const W=hW,H=hH;hx.setTransform(hd,0,0,hd,0,0);hx.clearRect(0,0,W,H);
+  const k=Math.min(W,H)/480;
+  // sun + clouds
+  hx.fillStyle='rgba(255,201,74,.55)';hx.beginPath();hx.arc(W*.82,H*.18,42*k,0,7);hx.fill();
+  hx.fillStyle='rgba(255,255,255,.9)';
+  [[.2,.16,1],[.55,.1,.7],[.9,.34,.8]].forEach(([cx,cy,s],i)=>{const x=((cx*W+t*12*(i+1))%(W+200))-100,y=cy*H;hx.beginPath();hx.ellipse(x,y,60*s*k,18*s*k,0,0,7);hx.ellipse(x+30*s*k,y-10*s*k,36*s*k,20*s*k,0,0,7);hx.fill();});
+  // building silhouette
+  hx.fillStyle='#c4dbe8';[[.05,.45,.12],[.2,.38,.1],[.33,.5,.14],[.6,.42,.1],[.75,.52,.16],[.9,.4,.1]].forEach(([x,h,w])=>hx.fillRect(x*W,H*(1-h)-H*.18,w*W,H*h));
+  // floor
+  const fy=H*.8;hx.fillStyle='#dfe7ec';hx.fillRect(0,fy,W,H-fy);
+  hx.fillStyle='#cdd8df';for(let x=0;x<W;x+=46*k)hx.fillRect(x,fy,2,H-fy);
+  // rail
+  const ry=H*.56,rx0=W*.45,rx1=W*.98;
+  hx.strokeStyle='#8fa3b0';hx.lineWidth=5*k;hx.lineCap='round';hx.beginPath();hx.moveTo(rx0,ry);hx.lineTo(rx1,ry);hx.stroke();
+  hx.lineWidth=3*k;for(let x=rx0;x<=rx1;x+=34*k){hx.beginPath();hx.moveTo(x,ry);hx.lineTo(x,fy);hx.stroke();}
+  hx.fillStyle='rgba(30,167,225,.07)';hx.fillRect(rx0,ry,rx1-rx0,fy-ry);
+  // droppings
+  hx.fillStyle='#f4f2ea';[[.55,.82],[.66,.86],[.8,.83],[.9,.88]].forEach(([x,y])=>{hx.beginPath();hx.ellipse(x*W,y*H,6*k,3*k,0,0,7);hx.fill();});
+
+  // timeline
+  const lt=reduce?3.25:t%LOOP;
+  const land={x:W*.76,y:ry-24*k};const start={x:W*1.15,y:H*.12};
+  let bx,by,flap=Math.sin(lt*22),bs=1.05*k,flip=false,show=true;
+  if(lt<2.2){const e=ease(lt/2.2);bx=lerp(start.x,land.x,e);by=lerp(start.y,land.y,e)+Math.sin(lt*5)*6*k;}
+  else if(lt<3.35){bx=land.x;by=land.y;flap=lt<2.5?Math.sin(lt*22)*.6:.15;}
+  else if(lt<5.4){const e=(lt-3.35)/2;bx=land.x+e*e*W*.5;by=land.y-e*H*.75;flap=Math.sin(lt*34);flip=true;}
+  else show=false;
+  // turret
+  const tx=W*.16,ty=fy;
+  const piv={x:tx,y:ty-118*k};
+  let ang=-.25+Math.sin(lt*1.2)*.12;
+  if(lt>1.6&&lt<3.6&&show){const tgt=Math.atan2((land.y-12*k)-piv.y-40*k,land.x-piv.x);ang=lerp(ang,tgt,Math.min(1,(lt-1.6)/.6));}
+  hx.fillStyle='#8796a2';hx.beginPath();hx.roundRect?hx.roundRect(tx-14*k,ty-90*k,28*k,90*k,6*k):hx.rect(tx-14*k,ty-90*k,28*k,90*k);hx.fill();
+  hx.fillStyle='rgba(30,167,225,.55)';hx.beginPath();hx.roundRect?hx.roundRect(tx+20*k,ty-48*k,30*k,48*k,8*k):hx.rect(tx+20*k,ty-48*k,30*k,48*k);hx.fill();
+  hx.fillStyle='#ffffff';hx.strokeStyle='#c8d5de';hx.lineWidth=2;hx.beginPath();hx.arc(piv.x,piv.y,34*k,0,7);hx.fill();hx.stroke();
+  hx.save();hx.translate(piv.x,piv.y);hx.rotate(ang);
+  hx.fillStyle='#3a4650';hx.beginPath();hx.roundRect?hx.roundRect(10*k,-6*k,58*k,12*k,5*k):hx.rect(10*k,-6*k,58*k,12*k);hx.fill();
+  hx.fillStyle=C.water;hx.fillRect(64*k,-7*k,8*k,14*k);
+  hx.fillStyle='#24303a';hx.beginPath();hx.roundRect?hx.roundRect(-6*k,-30*k,26*k,16*k,4*k):hx.rect(-6*k,-30*k,26*k,16*k);hx.fill();
+  const lockOn=lt>1.6&&lt<3.6;hx.fillStyle=lockOn?C.coral:C.sun;hx.beginPath();hx.arc(16*k,-22*k,4*k,0,7);hx.fill();
+  hx.restore();
+  // spray
+  const g=900*k;
+  if(!reduce){
+    if(lt>2.55&&lt<3.3){const nx=piv.x+Math.cos(ang)*72*k,ny=piv.y+Math.sin(ang)*72*k,tf=.42;
+      for(let n=0;n<3;n++){const tgx=land.x+(Math.random()-.5)*20*k,tgy=land.y+(Math.random()-.5)*16*k;drp.push({x:nx,y:ny,vx:(tgx-nx)/tf,vy:(tgy-ny-.5*g*tf*tf)/tf,l:0});}}
+    if(lt<.05)drp.length=0;
+  }else if(!drp.length){const nx=piv.x+Math.cos(ang)*72*k,ny=piv.y+Math.sin(ang)*72*k,tf=.42;for(let n=0;n<40;n++){const f=n/40*tf;const vx=(land.x-nx)/tf,vy=(land.y-ny-.5*g*tf*tf)/tf;drp.push({x:nx+vx*f,y:ny+vy*f+.5*g*f*f,vx:0,vy:0,l:0,st:true});}}
+  hx.fillStyle=C.water;
+  for(let i=drp.length-1;i>=0;i--){const d=drp[i];if(!d.st){d.vy+=g/60;d.x+=d.vx/60;d.y+=d.vy/60;d.l+=1/60;}
+    hx.globalAlpha=Math.max(0,1-d.l*1.2);hx.beginPath();hx.arc(d.x,d.y,3.4*k,0,7);hx.fill();
+    if(d.y>fy||d.l>1)drp.splice(i,1);}
+  hx.globalAlpha=1;
+  if(show)drawBird(bx,by,flap,bs,flip);
+  // labels
+  hx.font=`500 ${14*k}px "Mitr",sans-serif`;
+  if(lt>1.6&&lt<3.35){hx.fillStyle=C.coral;hx.strokeStyle=C.coral;hx.lineWidth=2;const s=40*k;hx.strokeRect(land.x-s,land.y-s,2*s,1.6*s);hx.fillText('ล็อกเป้า',land.x-s,land.y-s-8*k);}
+  if(lt>3.35&&lt<4.8){hx.fillStyle=C.leaf;hx.fillText('ไล่สำเร็จ ✓',land.x-30*k,land.y-30*k);}
+}
+sizeHero();drawHero(3.2);
+addEventListener('resize',()=>{sizeHero();drawHero(performance.now()/1000);});
+let heroRaf=null;
+function heroLoop(t){if(!heroOn){heroRaf=null;return;}drawHero(t/1000);heroRaf=requestAnimationFrame(heroLoop);}
+function onSlide(i){
+  heroOn=i===0&&!reduce;if(heroOn&&!heroRaf)heroRaf=requestAnimationFrame(heroLoop);
+  const simI=slides.indexOf(document.getElementById('simSlide'));
+  if(i===simI&&!simStarted){simStarted=true;setTimeout(initSim,350);}
+  if(window.__sim)window.__sim.setVisible(i===simI);
+}
+let simStarted=false;
+go(0);
+
+/* ---------- 3D simulation ---------- */
+const stage=document.getElementById('stage');
+function initSim(){
+  if(!window.THREE){document.getElementById('fallback').style.display='flex';return;}
+  const V3=THREE.Vector3,G=9.8,VW=15,RANGE=17;
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  const wrap=a=>{while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;};
+
+  const renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.domElement.className='gl';
+  stage.prepend(renderer.domElement);
+  const scene=new THREE.Scene();
+  scene.background=new THREE.Color(0xd7eaf4);
+  scene.fog=new THREE.Fog(0xd7eaf4,24,62);
+  const cam=new THREE.PerspectiveCamera(45,1,0.1,200);
+  scene.add(new THREE.HemisphereLight(0xffffff,0xb8c8d2,1.0));
+  const sun=new THREE.DirectionalLight(0xfff1d6,.75);sun.position.set(6,12,8);scene.add(sun);
+
+  const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.8,metalness:.05},o));
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(14,8),M(0xd9e1e6,{roughness:.95}));floor.rotation.x=-Math.PI/2;scene.add(floor);
+  const grid=new THREE.GridHelper(14,14,0xbac8d0,0xc5d1d8);grid.scale.z=8/14;grid.position.y=.005;scene.add(grid);
+  const wall=new THREE.Mesh(new THREE.BoxGeometry(14,4,.2),M(0xf3f5f6));wall.position.set(0,2,4.1);scene.add(wall);
+  const railM=M(0x8fa3b0,{metalness:.5,roughness:.4});
+  for(let x=-7;x<=7.01;x+=1){const p=new THREE.Mesh(new THREE.BoxGeometry(.05,1.1,.05),railM);p.position.set(x,.55,-4);scene.add(p);}
+  const top=new THREE.Mesh(new THREE.BoxGeometry(14.1,.06,.09),railM);top.position.set(0,1.1,-4);scene.add(top);
+  const glass=new THREE.Mesh(new THREE.PlaneGeometry(14,.95),new THREE.MeshStandardMaterial({color:0x7cc6ea,transparent:true,opacity:.15,side:THREE.DoubleSide}));glass.position.set(0,.5,-4);scene.add(glass);
+  const dropM=M(0xf7f5ee);
+  for(let i=0;i<14;i++){const d=new THREE.Mesh(new THREE.SphereGeometry(rand(.04,.08),8,6),dropM);d.scale.y=.25;d.position.set(rand(-6,6),.01,rand(-3.8,-2.2));scene.add(d);}
+  for(let i=0;i<16;i++){const h=rand(6,22);const b=new THREE.Mesh(new THREE.BoxGeometry(rand(3,6),h,rand(3,6)),M(0xb9d0dd));b.position.set(-40+i*5.5+rand(-1,1),h/2-6,rand(-50,-38));scene.add(b);}
+  const pot=new THREE.Mesh(new THREE.CylinderGeometry(.3,.22,.5,16),M(0xd7825a));pot.position.set(-5.5,.25,2.6);scene.add(pot);
+  const leaves=new THREE.Mesh(new THREE.SphereGeometry(.5,12,10),M(0x5aa36a));leaves.position.set(-5.5,.85,2.6);scene.add(leaves);
+
+  const base=new THREE.Group();base.position.set(3.6,0,1.8);scene.add(base);
+  const ped=new THREE.Mesh(new THREE.CylinderGeometry(.24,.3,.8,20),M(0x8796a2));ped.position.y=.4;base.add(ped);
+  const tank=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.55,20),new THREE.MeshStandardMaterial({color:0x1ea7e1,transparent:true,opacity:.5,roughness:.2}));tank.position.set(.55,.28,.1);base.add(tank);
+  const hose=new THREE.Mesh(new THREE.TorusGeometry(.3,.02,6,16,Math.PI),M(0x3a4650));hose.position.set(.27,.56,.1);base.add(hose);
+  const yawG=new THREE.Group();yawG.position.y=.82;base.add(yawG);
+  const ring=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.1,24),M(0x9aa8b2,{metalness:.4}));yawG.add(ring);
+  const pitchG=new THREE.Group();pitchG.position.y=.3;yawG.add(pitchG);
+  const dome=new THREE.Mesh(new THREE.SphereGeometry(.27,24,18),M(0xffffff,{roughness:.45}));dome.scale.set(1,1.15,1);pitchG.add(dome);
+  const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.04,.055,.75,14),M(0x3a4650,{metalness:.6,roughness:.35}));barrel.rotation.x=Math.PI/2;barrel.position.z=.42;pitchG.add(barrel);
+  const tipRing=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.06,14),M(0x1ea7e1,{emissive:0x0d4f6e}));tipRing.rotation.x=Math.PI/2;tipRing.position.z=.8;pitchG.add(tipRing);
+  const tip=new THREE.Object3D();tip.position.z=.84;pitchG.add(tip);
+  const camBox=new THREE.Mesh(new THREE.BoxGeometry(.14,.1,.18),M(0x24303a));camBox.position.set(.22,.1,.1);pitchG.add(camBox);
+  const lensM=new THREE.MeshStandardMaterial({color:0xffc94a,emissive:0xffb000,emissiveIntensity:.6});
+  const lens=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.03,12),lensM);lens.rotation.x=Math.PI/2;lens.position.set(.22,.1,.2);pitchG.add(lens);
+  const wide=new THREE.Mesh(new THREE.BoxGeometry(.2,.1,.08),M(0x24303a));wide.position.set(-.2,.85,.05);base.add(wide);
+  const pivot=new V3();
+
+  const MAXP=700,ppos=new Float32Array(MAXP*3),P=[];
+  for(let i=0;i<MAXP;i++){P.push({a:false,p:new V3(),v:new V3(),life:0});ppos[i*3+1]=-100;}
+  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(ppos,3));
+  const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x1597d0,size:.09,transparent:true,opacity:.85,depthWrite:false}));pts.frustumCulled=false;scene.add(pts);
+  const tipW=new V3(),dirW=new V3();
+  function emit(n){
+    tip.getWorldPosition(tipW);pitchG.getWorldPosition(pivot);dirW.copy(tipW).sub(pivot).normalize();
+    for(let k=0;k<n;k++){const q=P.find(o=>!o.a);if(!q)return;q.a=true;q.life=0;q.p.copy(tipW);
+      q.v.copy(dirW).add(new V3(rand(-.018,.018),rand(-.018,.018),rand(-.018,.018))).normalize().multiplyScalar(VW*rand(.97,1.03));
+      stats.water+=0.5;}
+  }
+
+  const birds=[],cats=[];let birdSeq=0;
+  const birdBody=M(0x8a95a5),birdHead=M(0x5d6878),birdWing=M(0xa3adbb),beakM=M(0xd99a3c);
+  function spawnBird(){
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.SphereGeometry(.17,12,10),birdBody);body.scale.set(1,.95,1.7);g.add(body);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.1,10,8),birdHead);head.position.set(0,.13,.24);g.add(head);
+    const beak=new THREE.Mesh(new THREE.ConeGeometry(.025,.08,6),beakM);beak.rotation.x=Math.PI/2;beak.position.set(0,.12,.35);g.add(beak);
+    const tail=new THREE.Mesh(new THREE.BoxGeometry(.16,.02,.18),birdHead);tail.position.set(0,.02,-.32);g.add(tail);
+    const wL=new THREE.Group(),wR=new THREE.Group();wL.position.set(.12,.06,0);wR.position.set(-.12,.06,0);
+    const wg=new THREE.BoxGeometry(.42,.02,.2);const a=new THREE.Mesh(wg,birdWing);a.position.x=.21;wL.add(a);const b=new THREE.Mesh(wg,birdWing);b.position.x=-.21;wR.add(b);
+    g.add(wL);g.add(wR);g.scale.setScalar(1.5);
+    const land=new V3(rand(-6,6),1.31,-4);
+    g.position.set(land.x+rand(-8,8),rand(5,9),-28);
+    scene.add(g);
+    const bird={g,wL,wR,head,land,state:'approach',vel:new V3(),ph:rand(0,6),id:++birdSeq};
+    birds.push(bird);log('นก #'+bird.id+' บินเข้าพื้นที่','');
+  }
+  function updBird(b,dt,t){
+    const p=b.g.position;
+    if(b.state==='approach'){
+      const d=b.land.clone().sub(p),dist=d.length();
+      const sp=Math.min(4.2,.6+dist*.55);b.vel.copy(d.normalize().multiplyScalar(sp));
+      p.addScaledVector(b.vel,dt);p.y+=Math.sin(t*3+b.ph)*.004;
+      b.g.lookAt(p.clone().add(new V3(b.vel.x,b.vel.y*.3,b.vel.z)));
+      const f=Math.sin(t*16+b.ph)*.75;b.wL.rotation.z=f;b.wR.rotation.z=-f;
+      if(dist<.06){b.state='landed';b.vel.set(0,0,0);b.g.rotation.set(0,rand(-.6,.6),0);}
+    }else if(b.state==='landed'){
+      b.wL.rotation.z=-.15;b.wR.rotation.z=.15;b.head.position.y=.13-Math.max(0,Math.sin(t*4+b.ph))*.06;
+    }else if(b.state==='flee'){
+      b.vel.y+=2.5*dt;b.vel.multiplyScalar(1+.4*dt);p.addScaledVector(b.vel,dt);
+      b.g.lookAt(p.clone().add(b.vel));const f=Math.sin(t*28+b.ph)*.9;b.wL.rotation.z=f;b.wR.rotation.z=-f;
+      if(p.y>18||p.z<-40||Math.abs(p.x)>30){scene.remove(b.g);birds.splice(birds.indexOf(b),1);}
+    }
+  }
+  function scare(b){
+    if(b.state==='flee')return;
+    b.state='flee';
+    const away=b.g.position.clone().sub(base.position);away.y=0;away.normalize();
+    b.vel.copy(away.multiplyScalar(4)).add(new V3(rand(-1,1),3.5,-2));
+    stats.hits++;
+    if(b===T.target){const r=simT-T.detectAt;stats.resp.push(r);log('ไล่นก #'+b.id+' สำเร็จ ใช้เวลา '+r.toFixed(1)+' วินาที','o');}
+    else log('นก #'+b.id+' โดนละอองน้ำ บินหนีไป','o');
+  }
+
+  const catM=M(0xe08a3c),catD=M(0xa85e22);
+  function spawnCat(){
+    if(cats.length)return;
+    const g=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.BoxGeometry(.58,.22,.22),catM);body.position.y=.3;g.add(body);
+    const head=new THREE.Mesh(new THREE.BoxGeometry(.2,.18,.2),catM);head.position.set(.36,.42,0);g.add(head);
+    [-.06,.06].forEach(z=>{const e=new THREE.Mesh(new THREE.ConeGeometry(.04,.09,4),catD);e.position.set(.36,.55,z);g.add(e);});
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(.025,.02,.42,6),catD);tail.position.set(-.42,.46,0);tail.rotation.z=.8;g.add(tail);
+    const legs=[];[[.2,.08],[.2,-.08],[-.2,.08],[-.2,-.08]].forEach(([x,z])=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.06,.2,.06),catM);l.position.set(x,.1,z);g.add(l);legs.push(l);});
+    const dir=Math.random()<.5?1:-1;g.position.set(-8.5*dir,0,rand(-1.6,.8));g.rotation.y=dir===1?0:Math.PI;
+    scene.add(g);cats.push({g,legs,tail,dir});log('แมวเดินเข้ามาบนระเบียง','h');
+  }
+  function updCat(c,dt,t){
+    c.g.position.x+=c.dir*1.0*dt;
+    c.legs.forEach((l,i)=>l.rotation.z=Math.sin(t*8+(i%2?Math.PI:0)+(i>1?Math.PI:0))*.4);
+    c.tail.rotation.x=Math.sin(t*2)*.3;
+    if(Math.abs(c.g.position.x)>9){scene.remove(c.g);cats.splice(cats.indexOf(c),1);log('แมวออกจากพื้นที่','');}
+  }
+  const catPresent=()=>cats.some(c=>Math.abs(c.g.position.x)<7.3);
+
+  const LABEL={SEARCH:'เฝ้าระวัง',DETECT:'ตรวจพบเป้า',IFF:'ระบุฝ่าย',TRACK:'ล็อกเป้า',AWAIT:'รออนุมัติ',ENGAGE:'ฉีดน้ำ',ASSESS:'ประเมินผล',HOLD:'งดฉีด: มีสัตว์เลี้ยงในพื้นที่'};
+  const T={state:'SEARCH',t:0,target:null,yaw:Math.PI+.2,pitch:-.2,errY:0,errP:0,burst:0,corr:0,salvo:0,detectAt:0,lastErrLog:0};
+  const stats={hits:0,water:0,resp:[],hold:0};
+  let manual=false,simT=0;
+  const el=id=>document.getElementById(id);
+  const chip=el('chip'),chipTxt=el('chipTxt'),fireBtn=el('fire');
+  function setState(s,msg,cls){T.state=s;T.t=0;chip.dataset.s=s;chipTxt.textContent=LABEL[s];fireBtn.disabled=s!=='AWAIT';if(msg)log(msg,cls);}
+  function pick(){let best=null,bd=1e9;for(const b of birds){if(b.state==='flee')continue;const d=b.g.position.distanceTo(base.position);if(d<RANGE&&d<bd){bd=d;best=b;}}return best;}
+  function aim(b){
+    pitchG.getWorldPosition(pivot);
+    let tp=b.g.position.clone();
+    for(let k=0;k<3;k++){const tf=tp.distanceTo(pivot)/VW;tp=b.g.position.clone().addScaledVector(b.vel,tf);tp.y+=.5*G*tf*tf;}
+    const d=tp.sub(pivot);return{yaw:Math.atan2(d.x,d.z),pitch:-Math.atan2(d.y,Math.hypot(d.x,d.z))};
+  }
+  function slew(cy,cp,dt){
+    const r=2.6*dt;const dy=wrap(cy-T.yaw);T.yaw+=Math.max(-r,Math.min(r,dy));
+    cp=Math.max(-1.25,Math.min(.35,cp));const dp=cp-T.pitch;T.pitch+=Math.max(-r,Math.min(r,dp));
+    yawG.rotation.y=T.yaw;pitchG.rotation.x=T.pitch;return Math.hypot(wrap(cy-T.yaw),cp-T.pitch);
+  }
+  const errDeg=()=>Math.hypot(T.errY,T.errP)*180/Math.PI;
+  const newErr=()=>{T.errY=rand(-.075,.075);T.errP=rand(-.06,.06);};
+  function updTurret(dt){
+    T.t+=dt;const tg=T.target;const valid=tg&&tg.state!=='flee'&&birds.includes(tg);const cat=catPresent();
+    let ae=1;
+    if(T.state!=='SEARCH'&&valid){const a=aim(tg);ae=slew(a.yaw+T.errY,a.pitch+T.errP,dt);}
+    switch(T.state){
+      case 'SEARCH':{
+        slew(Math.PI+.25+.75*Math.sin(simT*.45),-.22+.08*Math.sin(simT*.9),dt);
+        const b=pick();if(b){T.target=b;T.detectAt=simT;setState('DETECT','ตรวจพบวัตถุบินเข้ามา ระยะ '+b.g.position.distanceTo(base.position).toFixed(1)+' ม.','a');}
+        break;}
+      case 'DETECT': if(!valid){setState('SEARCH');break;} if(T.t>.45)setState('IFF'); break;
+      case 'IFF':
+        if(!valid){setState('SEARCH');break;}
+        if(T.t>.4){
+          if(cat){stats.hold++;newErr();setState('HOLD','IFF: พบสัตว์เลี้ยงในพื้นที่ งดฉีด','h');}
+          else{newErr();T.salvo=0;setState('TRACK','IFF: ยืนยันเป้าเป็นนกพิราบ ล็อกเป้า','a');}
+        } break;
+      case 'HOLD':
+        if(!valid){setState('SEARCH','เป้าออกจากพื้นที่ กลับไปเฝ้าระวัง');break;}
+        if(!cat)setState('TRACK','พื้นที่ปลอดภัยแล้ว กลับมาล็อกเป้า','a');
+        break;
+      case 'TRACK':
+        if(!valid){setState('SEARCH');break;}
+        if(cat){stats.hold++;setState('HOLD','IFF: สัตว์เลี้ยงเข้ามาในภาพ งดฉีด','h');break;}
+        if(ae<.03&&T.t>.3){if(manual)setState('AWAIT','ล็อกเป้าแล้ว ส่งภาพให้เจ้าของอนุมัติ','a');else startBurst();}
+        break;
+      case 'AWAIT':
+        if(!valid){setState('SEARCH');break;}
+        if(cat){stats.hold++;setState('HOLD','IFF: สัตว์เลี้ยงเข้ามาในภาพ งดฉีด','h');}
+        break;
+      case 'ENGAGE':{
+        if(cat){stats.hold++;setState('HOLD','หยุดฉีดกลางคัน: สัตว์เลี้ยงเข้ามาในภาพ','h');break;}
+        emit(Math.round(95*dt+Math.random()*.6));
+        T.corr+=dt;
+        const tof=valid?tg.g.position.distanceTo(pivot)/VW:.6;
+        if(T.t>tof&&T.corr>.22&&errDeg()>.35){const before=errDeg();T.errY*=.35;T.errP*=.35;T.corr=0;
+          if(simT-T.lastErrLog>.6){log('ปรับเล็งแบบวงปิด: '+before.toFixed(1)+'° → '+errDeg().toFixed(1)+'°','w');T.lastErrLog=simT;}}
+        if(T.t>T.burst)setState('ASSESS');
+        break;}
+      case 'ASSESS':
+        if(T.t>1.1){if(valid)setState('TRACK','เป้ายังอยู่ เตรียมฉีดซ้ำ','a');else setState('SEARCH');}
+        break;
+    }
+  }
+  function startBurst(){T.salvo++;T.burst=rand(.45,.95);T.corr=0;setState('ENGAGE','ฉีดชุดที่ '+T.salvo+' · ยาว '+T.burst.toFixed(2)+' วินาที (สุ่มรูปแบบ)','w');}
+  fireBtn.addEventListener('click',()=>{if(T.state==='AWAIT')startBurst();});
+
+  function updParticles(dt){
+    for(let i=0;i<MAXP;i++){const q=P[i];
+      if(q.a){q.v.y-=G*dt;q.p.addScaledVector(q.v,dt);q.life+=dt;
+        for(const b of birds){if(b.state!=='flee'&&q.p.distanceTo(b.g.position)<.5){scare(b);break;}}
+        if(q.p.y<0||q.life>3)q.a=false;}
+      if(q.a){ppos[i*3]=q.p.x;ppos[i*3+1]=q.p.y;ppos[i*3+2]=q.p.z;}else ppos[i*3+1]=-100;}
+    pg.attributes.position.needsUpdate=true;
+  }
+
+  const logEl=el('log');
+  function log(msg,cls){const li=document.createElement('li');if(cls)li.className=cls;
+    const s=simT;li.innerHTML='<span>'+String(Math.floor(s/60)).padStart(2,'0')+':'+(s%60).toFixed(1).padStart(4,'0')+'</span><span></span>';li.lastChild.textContent=msg;
+    logEl.prepend(li);while(logEl.children.length>8)logEl.lastChild.remove();}
+  function hud(){
+    const tg=T.target,valid=tg&&tg.state!=='flee'&&birds.includes(tg)&&T.state!=='SEARCH';
+    el('hTgt').textContent=valid?'นก #'+tg.id+' · '+tg.g.position.distanceTo(base.position).toFixed(1)+' ม. · สูง '+tg.g.position.y.toFixed(1)+' ม.':'–';
+    el('hErr').textContent=valid&&T.state!=='DETECT'&&T.state!=='IFF'?errDeg().toFixed(1)+'°':'–';
+    const cat=catPresent();el('hIff').textContent=cat?'พบสัตว์เลี้ยง · ห้ามฉีด':'พื้นที่ปลอดภัย';el('hIff').style.color=cat?C.coral:'';
+    el('sHit').textContent=stats.hits;el('sWater').textContent=Math.round(stats.water);
+    el('sResp').textContent=stats.resp.length?(stats.resp.reduce((a,b)=>a+b,0)/stats.resp.length).toFixed(1):'–';
+    el('sHold').textContent=stats.hold;
+    el('clock').textContent='T+'+String(Math.floor(simT/60)).padStart(2,'0')+':'+(simT%60).toFixed(1).padStart(4,'0');
+  }
+
+  const ov=el('overlay'),ox=ov.getContext('2d');const tmp=new V3();let dpr=1;
+  function box(pos,size,color,label,dashed){
+    tmp.copy(pos).project(cam);if(tmp.z>1)return;
+    const w=ov.width,h=ov.height,x=(tmp.x+1)/2*w,y=(1-tmp.y)/2*h;
+    const s=Math.max(14,size*h/(cam.position.distanceTo(pos)*0.83))*0.5;
+    ox.strokeStyle=color;ox.lineWidth=2*dpr;ox.setLineDash(dashed?[4*dpr,4*dpr]:[]);
+    const c=s*.45;ox.beginPath();
+    [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy])=>{ox.moveTo(x+sx*s,y+sy*s-sy*c);ox.lineTo(x+sx*s,y+sy*s);ox.lineTo(x+sx*s-sx*c,y+sy*s);});
+    ox.stroke();ox.setLineDash([]);
+    ox.font=`500 ${12*dpr}px "Mitr","IBM Plex Sans Thai Looped",sans-serif`;
+    const tw=ox.measureText(label).width;ox.fillStyle='rgba(255,255,255,.85)';ox.fillRect(x+s+3*dpr,y-s-2*dpr,tw+10*dpr,18*dpr);
+    ox.fillStyle=color;ox.fillText(label,x+s+8*dpr,y-s+11*dpr);
+  }
+  function drawOverlay(){
+    ox.clearRect(0,0,ov.width,ov.height);
+    for(const b of birds){if(b.state==='flee')continue;const d=b.g.position.distanceTo(base.position);if(d>RANGE)continue;
+      const isT=b===T.target&&T.state!=='SEARCH';
+      const col=isT?(T.state==='ENGAGE'?C.water:C.lock):C.muted;
+      box(b.g.position,.9,col,isT?('ล็อก · นก #'+b.id):('นก #'+b.id),!isT);}
+    for(const c of cats){if(Math.abs(c.g.position.x)>7.3)continue;const p=c.g.position.clone();p.y+=.3;box(p,1.1,C.coral,'สัตว์เลี้ยง · ห้ามฉีด',false);}
+  }
+
+  const orb={th:.42,ph:1.08,r:14.5,tgt:new V3(0,1.2,-1.2)};
+  function placeCam(){cam.position.set(orb.tgt.x+orb.r*Math.sin(orb.ph)*Math.sin(orb.th),orb.tgt.y+orb.r*Math.cos(orb.ph),orb.tgt.z+orb.r*Math.sin(orb.ph)*Math.cos(orb.th));cam.lookAt(orb.tgt);}
+  let drag=null;const cv=renderer.domElement;
+  cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,touch:e.pointerType==='touch'};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;orb.th=Math.max(-1.1,Math.min(1.1,orb.th-(e.clientX-drag.x)*.005));if(!drag.touch)orb.ph=Math.max(.55,Math.min(1.45,orb.ph-(e.clientY-drag.y)*.004));drag.x=e.clientX;drag.y=e.clientY;placeCam();});
+  const end=()=>drag=null;cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+  placeCam();
+
+  function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dpr=Math.min(devicePixelRatio,2);ov.width=w*dpr;ov.height=h*dpr;}
+  new ResizeObserver(resize).observe(stage);resize();
+
+  el('bBird').addEventListener('click',spawnBird);
+  el('bFlock').addEventListener('click',()=>{spawnBird();setTimeout(spawnBird,700);setTimeout(spawnBird,1400);});
+  el('bCat').addEventListener('click',spawnCat);
+  const mA=el('mAuto'),mM=el('mMan');
+  function setMode(m){manual=m;mA.setAttribute('aria-pressed',String(!m));mM.setAttribute('aria-pressed',String(m));log(m?'โหมดควบคุมเอง: ต้องกดอนุมัติก่อนฉีด':'โหมดอัตโนมัติ','a');if(!m&&T.state==='AWAIT')startBurst();}
+  mA.addEventListener('click',()=>setMode(false));mM.addEventListener('click',()=>setMode(true));
+  const autoCb=el('auto');
+  let nextBird=1.2,nextCat=16;
+
+  let visible=false,raf=null,last=0;
+  function tick(now){
+    if(!visible){raf=null;return;}
+    const dt=Math.min(.05,(now-last)/1000||.016);last=now;simT+=dt;
+    if(autoCb.checked){
+      if(simT>nextBird){if(birds.filter(b=>b.state!=='flee').length<2)spawnBird();nextBird=simT+rand(4.5,8);}
+      if(simT>nextCat){spawnCat();nextCat=simT+rand(24,34);}
+    }
+    birds.slice().forEach(b=>updBird(b,dt,simT));
+    cats.slice().forEach(c=>updCat(c,dt,simT));
+    updTurret(dt);updParticles(dt);
+    lensM.emissiveIntensity=T.state==='SEARCH'?.4+.3*Math.sin(simT*4):1.2;
+    tank.scale.y=Math.max(.25,1-stats.water/12000);tank.position.y=.28*tank.scale.y;
+    renderer.render(scene,cam);drawOverlay();hud();
+    raf=requestAnimationFrame(tick);
+  }
+  window.__sim={setVisible(v){visible=v;if(v&&!raf){resize();last=performance.now();raf=requestAnimationFrame(tick);}}};
+  log('ระบบ CIWS ออนไลน์ · เริ่มเฝ้าระวัง','a');
+  window.__sim.setVisible(cur===slides.indexOf(document.getElementById('simSlide')));
+}
+})();
+</script>
+</body>
+</html>
